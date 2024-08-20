@@ -1,0 +1,13 @@
+name: precious-metals-tracker
+version: 0.1.0
+
+authors:
+  - Robert Joseph Cox Jr <robert@studiorclv.com>
+
+targets:
+  precious-metals-tracker:
+    main: src/precious-metals-tracker.cr
+
+crystal: '>= 1.13.1'
+
+license: MIT
