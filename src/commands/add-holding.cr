@@ -14,11 +14,29 @@ module AddHolding
     puts "Purchase Source > "
     purchase_source : String? = gets
     if purchase_source.nil? || purchase_source.blank?
-      puts "no new holding provided".colorize(:red)
+      puts "please enter a valid purchase source".colorize(:red)
 
       exit
     end
 
-    puts "#{user_inputs}"
+    puts "Purchase Price > "
+    purchase_price : String? = gets
+    if purchase_source.nil? || purchase_source.blank?
+      puts "please enter a valid purchase price".colorize(:red)
+
+      exit
+    end
+
+    puts "Spot Price At Time Of Purchase > "
+    purchase_spot_price : String? = gets
+    if purchase_spot_price.nil? || purchase_spot_price.blank?
+      puts "please enter a valid purchase spot price".colorize(:red)
+
+      exit
+    end
+
+    puts "#{purchase_source}"
+    puts "#{purchase_price}"
+    puts "#{purchase_spot_price}"
   end
 end
