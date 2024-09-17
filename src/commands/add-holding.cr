@@ -1,6 +1,6 @@
 require "colorize"
 
-module AddHolding
+module Commands::AddHolding
   extend self
 
   # Execute the command and handle the user inputs

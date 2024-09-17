@@ -19,7 +19,7 @@ module Precious::Metals::Tracker
     end
 
     parser.on "-a", "--add", "Add new holding" do
-      AddHolding.execute
+      Commands::AddHolding.execute
 
       exit
     end
