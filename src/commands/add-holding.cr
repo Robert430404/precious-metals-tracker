@@ -8,35 +8,25 @@ module Commands::AddHolding
     self.request_information
   end
 
+  def request_field(field_name : String) : String
+    puts "#{field_name} > "
+    result : String? = gets
+    if result.nil? || result.blank?
+      puts "please enter a valid #{field_name}".colorize(:red)
+      exit
+    end
+
+    return result
+  end
+
   def request_information
     puts "Please enter the holding information:"
 
-    puts "Purchase Source > "
-    purchase_source : String? = gets
-    if purchase_source.nil? || purchase_source.blank?
-      puts "please enter a valid purchase source".colorize(:red)
+    purchase_source : String = self.request_field("Purchase Source")
+    purchase_price : String = self.request_field("Purchase Price")
+    purchase_spot_price : String = self.request_field("Spot Price At Time Of Purchase")
+    total_oz : String = self.request_field("Total Weight In Troy Ounces")
 
-      exit
-    end
-
-    puts "Purchase Price > "
-    purchase_price : String? = gets
-    if purchase_source.nil? || purchase_source.blank?
-      puts "please enter a valid purchase price".colorize(:red)
-
-      exit
-    end
-
-    puts "Spot Price At Time Of Purchase > "
-    purchase_spot_price : String? = gets
-    if purchase_spot_price.nil? || purchase_spot_price.blank?
-      puts "please enter a valid purchase spot price".colorize(:red)
-
-      exit
-    end
-
-    puts "#{purchase_source}"
-    puts "#{purchase_price}"
-    puts "#{purchase_spot_price}"
+    puts "#{purchase_source} - #{purchase_price} - #{purchase_spot_price} - #{total_oz}"
   end
 end
