@@ -6,16 +6,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// addHoldingCmd represents the addHolding command
 var addHoldingCmd = &cobra.Command{
 	Use:   "addHolding",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Adds a precious metals holding.",
+	Long:	 `This command walks you through adding a precious metals holding.
 
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+It requests the folling information:
+
+	- Purchase Price
+	- Purchase Source
+	- Spot Price at time of purchase
+	- Weight of holding
+	- Type of holding
+
+This then stores it for use inside of the tool.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("addHolding called")
 	},
@@ -23,14 +27,4 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(addHoldingCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// addHoldingCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// addHoldingCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
