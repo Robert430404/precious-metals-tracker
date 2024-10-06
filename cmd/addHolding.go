@@ -11,7 +11,7 @@ var addHoldingCmd = &cobra.Command{
 	Short: "Adds a precious metals holding.",
 	Long:	 `This command walks you through adding a precious metals holding.
 
-It requests the folling information:
+It requests the following information:
 
 	- Purchase Price
 	- Purchase Source
