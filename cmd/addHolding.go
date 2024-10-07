@@ -3,12 +3,12 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/robert430404/precious-metals-tracker/entities"
+	"github.com/robert430404/precious-metals-tracker/models"
 	"github.com/spf13/cobra"
 )
 
 func HandleAddHolding(cmd *cobra.Command, args []string) {
-	holding := entities.Holding{}
+	holding := models.Holding{}
 
 	holding.Hydrate()
 
