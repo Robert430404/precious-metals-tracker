@@ -9,18 +9,29 @@ import (
 )
 
 func HandleAddHolding(cmd *cobra.Command, args []string) {
-	prompt := promptui.Prompt{
+	purchasePricePrompt := promptui.Prompt{
 		Label:    "Purchase Price",
 		Validate: validations.ValidatePrice,
 	}
 
-	result, err := prompt.Run()
+	purchasePrice, err := purchasePricePrompt.Run()
 	if err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return
 	}
 
-	fmt.Printf("addHolding called %q\n", result)
+	purchaseSourcePrompt := promptui.Prompt{
+		Label:    "Purchase Source",
+		Validate: validations.ValidateString,
+	}
+
+	purchaseSource, err1 := purchaseSourcePrompt.Run()
+	if err1 != nil {
+		fmt.Printf("Purchase Source Failed %v\n", err1)
+		return
+	}
+
+	fmt.Printf("addHolding called %q, %q\n", purchasePrice, purchaseSource)
 }
 
 var addHoldingCmd = &cobra.Command{
