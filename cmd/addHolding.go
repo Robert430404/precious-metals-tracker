@@ -1,26 +1,17 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
-	"strconv"
 
 	"github.com/spf13/cobra"
 	"github.com/manifoldco/promptui"
+	"github.com/robert430404/precious-metals-tracker/validations"
 )
 
-func handleAddHolding(cmd *cobra.Command, args []string) {
-	validate := func(input string) error {
-		_, err := strconv.ParseFloat(input, 64)
-		if err != nil {
-			return errors.New("Invalid number")
-		}
-		return nil
-	}
-
+func HandleAddHolding(cmd *cobra.Command, args []string) {
 	prompt := promptui.Prompt{
-		Label:    "Number",
-		Validate: validate,
+		Label:    "Purchase Price",
+		Validate: validations.ValidatePrice,
 	}
 
 	result, err := prompt.Run()
@@ -46,7 +37,7 @@ It requests the following information:
 	- Type of holding
 
 This then stores it for use inside of the tool.`,
-	Run: handleAddHolding,
+	Run: HandleAddHolding,
 }
 
 func init() {
