@@ -1,8 +1,8 @@
 package validations
 
 import (
-	"strconv"
 	"errors"
+	"strconv"
 )
 
 func ValidatePrice(value string) error {
