@@ -1,14 +1,21 @@
 package cmd
 
 import (
-	"fmt"
 	"encoding/json"
+	"fmt"
 
+	"github.com/robert430404/precious-metals-tracker/config"
 	"github.com/robert430404/precious-metals-tracker/models"
 	"github.com/spf13/cobra"
 )
 
+func HandleFirstRun() {
+	fmt.Printf("Derived HOME: %q\n", config.GetConfig().ConfigPath)
+}
+
 func HandleAddHolding(cmd *cobra.Command, args []string) {
+	HandleFirstRun()
+
 	holding := &models.Holding{}
 	holding.Hydrate()
 
