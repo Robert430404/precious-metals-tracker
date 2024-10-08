@@ -16,7 +16,7 @@ func (self *Config) Hydrate() {
 		panic("could not load home home directory")
 	}
 
-	self.ConfigPath = homeDir + "/"
+	self.ConfigPath = homeDir + "/.local/share/precious-metals-tracker"
 }
 
 func GetConfig() *Config {

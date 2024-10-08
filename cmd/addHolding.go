@@ -10,7 +10,7 @@ import (
 )
 
 func HandleFirstRun() {
-	fmt.Printf("Derived HOME: %q\n", config.GetConfig().ConfigPath)
+	fmt.Printf("Derived ConfigPath: %q\n", config.GetConfig().ConfigPath)
 }
 
 func HandleAddHolding(cmd *cobra.Command, args []string) {
