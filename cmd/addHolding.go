@@ -3,6 +3,7 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/robert430404/precious-metals-tracker/config"
 	"github.com/robert430404/precious-metals-tracker/models"
@@ -11,6 +12,12 @@ import (
 
 func HandleFirstRun() {
 	fmt.Printf("Derived ConfigPath: %q\n", config.GetConfig().ConfigPath)
+	configPath := config.GetConfig().ConfigPath
+
+	err := os.MkdirAll(configPath, os.ModePerm)
+	if err != nil {
+		panic(fmt.Sprintf("there was a problem ensuring the config path: %v\n", err))
+	}
 }
 
 func HandleAddHolding(cmd *cobra.Command, args []string) {
