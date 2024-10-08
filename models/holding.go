@@ -15,12 +15,12 @@ const (
 )
 
 type Holding struct {
-	Price        string      `json:"price"`
-	Source       string      `json:"source"`
-	PurchaseSpot string      `json:"spot_price"`
-	Volume       string      `json:"unit_total"`
-	Weight       string      `json:"unit_weight"`
-	Type         HoldingType `json:"type"`
+	Price             string      `json:"price"`
+	Source            string      `json:"source"`
+	PurchaseSpotPrice string      `json:"purchase_spot_price"`
+	TotalUnits        string      `json:"total_units"`
+	UnitWeight        string      `json:"unit_weight"`
+	Type              HoldingType `json:"type"`
 }
 
 func (self *Holding) Hydrate() error {
@@ -43,21 +43,21 @@ func (self *Holding) Hydrate() error {
 		return err2
 	}
 
-	self.PurchaseSpot = spotPrice
+	self.PurchaseSpotPrice = spotPrice
 
 	totalUnits, err3 := self.PromptForValue("How Many Units", validations.ValidateTotal)
 	if err3 != nil {
 		return err3
 	}
 
-	self.Volume = totalUnits
+	self.TotalUnits = totalUnits
 
 	unitWeight, err4 := self.PromptForValue("Weight Of A Single Unit (in toz)", validations.ValidatePrice)
 	if err4 != nil {
 		return err4
 	}
 
-	self.Weight = unitWeight
+	self.UnitWeight = unitWeight
 
 	holdingType, err5 := self.PromptForType()
 	if err5 != nil {
