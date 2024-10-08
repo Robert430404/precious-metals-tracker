@@ -2,17 +2,23 @@ package cmd
 
 import (
 	"fmt"
+	"encoding/json"
 
 	"github.com/robert430404/precious-metals-tracker/models"
 	"github.com/spf13/cobra"
 )
 
 func HandleAddHolding(cmd *cobra.Command, args []string) {
-	holding := models.Holding{}
-
+	holding := &models.Holding{}
 	holding.Hydrate()
 
-	fmt.Printf("addHolding called %q, %q, %q, %q, %q, %q\n", holding.Price, holding.Source, holding.PurchaseSpot, holding.Volume, holding.Weight, holding.Type)
+	json, err := json.Marshal(holding)
+	if err != nil {
+		fmt.Printf("there was a problem stringifying your holding: %v\n", err)
+		return
+	}
+
+	fmt.Printf("addHolding called %q\n", json)
 }
 
 var addHoldingCmd = &cobra.Command{

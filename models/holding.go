@@ -15,12 +15,12 @@ const (
 )
 
 type Holding struct {
-	Price        string
-	Source       string
-	PurchaseSpot string
-	Volume       string
-	Weight       string
-	Type         HoldingType
+	Price        string      `json:"price"`
+	Source       string      `json:"source"`
+	PurchaseSpot string      `json:"spot_price"`
+	Volume       string      `json:"unit_total"`
+	Weight       string      `json:"unit_weight"`
+	Type         HoldingType `json:"type"`
 }
 
 func (self *Holding) Hydrate() error {
