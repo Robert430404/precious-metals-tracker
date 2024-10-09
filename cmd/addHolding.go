@@ -12,13 +12,18 @@ import (
 
 func HandleFirstRun() {
 	loadedConfig := config.GetConfig()
-	fmt.Printf("Derived ConfigPath: %q, %v\n", loadedConfig.ConfigPath, loadedConfig.RuntimeFlags.AddHoldingRan)
+	if loadedConfig.RuntimeFlags.AddHoldingRan {
+		return;
+	}
+
 	configPath := config.GetConfig().ConfigPath
 
 	err := os.MkdirAll(configPath, os.ModePerm)
 	if err != nil {
 		panic(fmt.Sprintf("there was a problem ensuring the config path: %v\n", err))
 	}
+
+	loadedConfig.RuntimeFlags.SetAddHoldingRan(true);
 }
 
 func HandleAddHolding(cmd *cobra.Command, args []string) {
