@@ -8,7 +8,7 @@ import (
 )
 
 type Flags struct {
-	AddHoldingRan bool `json:"add_hodling_ran"`
+	AddHoldingRan bool `json:"add_holding_ran"`
 }
 
 func (self *Flags) Hydrate() {
