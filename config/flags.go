@@ -11,9 +11,7 @@ type Flags struct {
 	AddHoldingRan bool `json:"add_holding_ran"`
 }
 
-func (self *Flags) Hydrate() {
-	path := GetConfig().ConfigPath
-
+func (self *Flags) Hydrate(path string) {
 	flags, err := os.Open(fmt.Sprintf("%q/flags.json", path))
 	if err != nil {
 		self.loadDefaults()

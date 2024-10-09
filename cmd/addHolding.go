@@ -11,7 +11,8 @@ import (
 )
 
 func HandleFirstRun() {
-	fmt.Printf("Derived ConfigPath: %q\n", config.GetConfig().ConfigPath)
+	loadedConfig := config.GetConfig()
+	fmt.Printf("Derived ConfigPath: %q, %v\n", loadedConfig.ConfigPath, loadedConfig.RuntimeFlags.AddHoldingRan)
 	configPath := config.GetConfig().ConfigPath
 
 	err := os.MkdirAll(configPath, os.ModePerm)

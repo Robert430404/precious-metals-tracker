@@ -6,6 +6,7 @@ import (
 
 type Config struct {
 	ConfigPath string
+	RuntimeFlags Flags
 }
 
 var HydratedConfig *Config = nil
@@ -17,6 +18,11 @@ func (self *Config) Hydrate() {
 	}
 
 	self.ConfigPath = homeDir + "/.local/share/precious-metals-tracker"
+
+	flags := Flags{}
+	flags.Hydrate(self.ConfigPath)
+
+	self.RuntimeFlags = flags
 }
 
 func GetConfig() *Config {
