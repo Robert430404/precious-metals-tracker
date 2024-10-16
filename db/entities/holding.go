@@ -1,3 +1,7 @@
 package entities
 
-type Holding struct {}
+import "gorm.io/gorm"
+
+type Holding struct {
+	gorm.Model
+}
