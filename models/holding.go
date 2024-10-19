@@ -15,6 +15,7 @@ const (
 )
 
 type Holding struct {
+	ProductName       string      `json:"product_name"`
 	Price             string      `json:"price"`
 	Source            string      `json:"source"`
 	PurchaseSpotPrice string      `json:"purchase_spot_price"`
@@ -23,41 +24,55 @@ type Holding struct {
 	Type              HoldingType `json:"type"`
 }
 
+type Prompt struct {
+	Label     string
+	Validator promptui.ValidateFunc
+	Setter    func(value string)
+}
+
 func (self *Holding) Hydrate() error {
-	purchasePrice, err := self.PromptForValue("Purchase Price", validations.ValidatePrice)
-	if err != nil {
-		return err
+	fields := [6]Prompt{
+		{
+			Label:     "Product Name",
+			Validator: validations.ValidateString,
+			Setter:    func(value string) { self.ProductName = value },
+		},
+		{
+			Label:     "Purchase Price",
+			Validator: validations.ValidatePrice,
+			Setter:    func(value string) { self.Price = value },
+		},
+		{
+			Label:     "Purchase Source",
+			Validator: validations.ValidateString,
+			Setter:    func(value string) { self.Source = value },
+		},
+		{
+			Label:     "Spot Price (at time of purchase)",
+			Validator: validations.ValidatePrice,
+			Setter:    func(value string) { self.PurchaseSpotPrice = value },
+		},
+		{
+			Label:     "How Many Units",
+			Validator: validations.ValidateTotal,
+			Setter:    func(value string) { self.TotalUnits = value },
+		},
+		{
+			Label:     "Weight Of A Single Unit (in toz)",
+			Validator: validations.ValidatePrice,
+			Setter:    func(value string) { self.UnitWeight = value },
+		},
 	}
 
-	self.Price = purchasePrice
+	for i := 0; i < len(fields); i++ {
+		prompt := fields[i]
+		value, err := self.PromptForValue(prompt.Label, prompt.Validator)
+		if err != nil {
+			return err
+		}
 
-	purchaseSource, err1 := self.PromptForValue("Purchase Source", validations.ValidateString)
-	if err1 != nil {
-		return err1
+		prompt.Setter(value)
 	}
-
-	self.Source = purchaseSource
-
-	spotPrice, err2 := self.PromptForValue("Spot Price (at time of purchase)", validations.ValidatePrice)
-	if err2 != nil {
-		return err2
-	}
-
-	self.PurchaseSpotPrice = spotPrice
-
-	totalUnits, err3 := self.PromptForValue("How Many Units", validations.ValidateTotal)
-	if err3 != nil {
-		return err3
-	}
-
-	self.TotalUnits = totalUnits
-
-	unitWeight, err4 := self.PromptForValue("Weight Of A Single Unit (in toz)", validations.ValidatePrice)
-	if err4 != nil {
-		return err4
-	}
-
-	self.UnitWeight = unitWeight
 
 	holdingType, err5 := self.PromptForType()
 	if err5 != nil {
