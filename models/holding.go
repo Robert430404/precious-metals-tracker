@@ -74,9 +74,9 @@ func (self *Holding) Hydrate() error {
 		prompt.Setter(value)
 	}
 
-	holdingType, err5 := self.PromptForType()
-	if err5 != nil {
-		return err5
+	holdingType, err := self.PromptForType()
+	if err != nil {
+		return err
 	}
 
 	self.Type = holdingType
