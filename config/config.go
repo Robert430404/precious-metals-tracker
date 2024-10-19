@@ -5,7 +5,8 @@ import (
 )
 
 type Config struct {
-	ConfigPath string
+	ConfigPath   string
+	SqlitePath   string
 	RuntimeFlags Flags
 }
 
@@ -23,6 +24,8 @@ func (self *Config) Hydrate() {
 	flags.Hydrate(self.ConfigPath)
 
 	self.RuntimeFlags = flags
+
+	self.SqlitePath = self.ConfigPath + "/precious-metals-tracker.sqlite"
 }
 
 func GetConfig() *Config {

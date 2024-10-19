@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func HandleFirstRun() {
+func handleFirstRun() {
 	loadedConfig := config.GetConfig()
 	if loadedConfig.RuntimeFlags.AddHoldingRan {
 		return;
@@ -26,8 +26,8 @@ func HandleFirstRun() {
 	loadedConfig.RuntimeFlags.SetAddHoldingRan(true);
 }
 
-func HandleAddHolding(cmd *cobra.Command, args []string) {
-	HandleFirstRun()
+func handleAddHolding(cmd *cobra.Command, args []string) {
+	handleFirstRun()
 
 	holding := &models.Holding{}
 	holding.Hydrate()
@@ -56,7 +56,7 @@ It requests the following information:
 	- Type Of Holding [Gold, Silver]
 
 This then stores it for use inside of the tool.`,
-	Run: HandleAddHolding,
+	Run: handleAddHolding,
 }
 
 func init() {
