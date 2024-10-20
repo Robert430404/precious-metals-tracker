@@ -5,16 +5,15 @@ import (
 	"os"
 
 	"github.com/robert430404/precious-metals-tracker/config"
+	"github.com/robert430404/precious-metals-tracker/db"
 	"github.com/robert430404/precious-metals-tracker/db/entities"
 	"github.com/spf13/cobra"
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
 )
 
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initializes the application in your environment",
-	Long:  `This command sets up and migrates the SQLite database for storing the holdings`,
+	Long:  `This command sets up and migrates the SQLite database for storing your holding information.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		loadedConfig := config.GetConfig()
 		sqlitePath := loadedConfig.SqlitePath
@@ -25,11 +24,7 @@ var initCmd = &cobra.Command{
 			os.Create(sqlitePath)
 		}
 
-		fmt.Print("opening connection to the sqlite database \n")
-		db, err := gorm.Open(sqlite.Open(sqlitePath), &gorm.Config{})
-		if err != nil {
-			panic("failed to connect database")
-		}
+		db := db.GetConnection()
 
 		fmt.Print("migrating the database \n")
 		db.AutoMigrate(&entities.Holding{})

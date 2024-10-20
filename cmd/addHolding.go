@@ -6,7 +6,9 @@ import (
 	"os"
 
 	"github.com/robert430404/precious-metals-tracker/config"
+	"github.com/robert430404/precious-metals-tracker/db"
 	"github.com/robert430404/precious-metals-tracker/models"
+	"github.com/robert430404/precious-metals-tracker/transformers"
 	"github.com/spf13/cobra"
 )
 
@@ -32,13 +34,11 @@ func handleAddHolding(cmd *cobra.Command, args []string) {
 	holding := &models.Holding{}
 	holding.Hydrate()
 
-	json, err := json.Marshal(holding)
-	if err != nil {
-		fmt.Printf("there was a problem stringifying your holding: %v\n", err)
-		return
-	}
+	db := db.GetConnection()
+	transformer := transformers.HoldingTransformer{}
 
-	fmt.Printf("addHolding called %q\n", json)
+	db.Create(transformer.TransformModelToEntity(holding))
+	fmt.Print("stored holding")
 }
 
 var addHoldingCmd = &cobra.Command{
