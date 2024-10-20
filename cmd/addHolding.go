@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -15,7 +14,7 @@ import (
 func handleFirstRun() {
 	loadedConfig := config.GetConfig()
 	if loadedConfig.RuntimeFlags.AddHoldingRan {
-		return;
+		return
 	}
 
 	configPath := config.GetConfig().ConfigPath
@@ -25,7 +24,7 @@ func handleFirstRun() {
 		panic(fmt.Sprintf("there was a problem ensuring the config path: %v\n", err))
 	}
 
-	loadedConfig.RuntimeFlags.SetAddHoldingRan(true);
+	loadedConfig.RuntimeFlags.SetAddHoldingRan(true)
 }
 
 func handleAddHolding(cmd *cobra.Command, args []string) {
