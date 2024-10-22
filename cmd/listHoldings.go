@@ -46,7 +46,7 @@ func handleListHoldings(cmd *cobra.Command, args []string) {
 
 	var holdings []entities.Holding
 
-	found := db.First(&holdings)
+	found := db.Find(&holdings)
 	if found.RowsAffected < 1 {
 		fmt.Print("no holdings are present, please add some. \n")
 		return

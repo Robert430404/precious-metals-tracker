@@ -32,7 +32,8 @@ var deleteHoldingCmd = &cobra.Command{
 		db := db.GetConnection()
 
 		db.Delete(&entities.Holding{}, result)
-		fmt.Println("deleteHolding called")
+
+		fmt.Printf("holding deleted: %v \n", result)
 	},
 }
 

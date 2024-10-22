@@ -38,7 +38,7 @@ func handleAddHolding(cmd *cobra.Command, args []string) {
 	transformed := transformer.TransformModelToEntity(holding)
 
 	db.Create(&transformed)
-	fmt.Print("stored holding")
+	fmt.Print("stored holding \n")
 }
 
 var addHoldingCmd = &cobra.Command{
