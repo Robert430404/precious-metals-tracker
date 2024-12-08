@@ -17,7 +17,6 @@ func renderTable(holdings []entities.Holding) {
 	table := table.New(
 		"ID",
 		"Name",
-		"Source",
 		"Purchase Spot Price",
 		"Total Units",
 		"Unit Weight",
@@ -30,7 +29,6 @@ func renderTable(holdings []entities.Holding) {
 		table.AddRow(
 			holding.ID,
 			holding.Name,
-			holding.Source,
 			holding.PurchaseSpotPrice,
 			holding.TotalUnits,
 			holding.UnitWeight,
