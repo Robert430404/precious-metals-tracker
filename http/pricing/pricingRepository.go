@@ -60,41 +60,41 @@ func (self *PricingRepository) GetSilverSpot() float64 {
 
 	oneDayAgo := time.Now().AddDate(0, 0, -1)
 	cacheOlderThanOneDay := cachedResponse.Timestamp < oneDayAgo.Unix()
-	if cacheOlderThanOneDay {
-		req, err3 := http.NewRequest("GET", self.ApiBaseUrl+"/api/XAG/USD", nil)
-		if err3 != nil {
-			fmt.Println("there was a problem retrieving the new spot price, using cache")
-			return cachedResponse.Price
-		}
-
-		req.Header.Add("x-access-token", self.ApiKey)
-
-		resp, err4 := self.HttpClient.Do(req)
-		if err4 != nil {
-			fmt.Println("there was a problem retrieving the new spot price, using cache")
-			return cachedResponse.Price
-		}
-
-		defer resp.Body.Close()
-
-		body, err5 := ioutil.ReadAll(resp.Body)
-		if err5 != nil {
-			fmt.Println("there was a problem retrieving the new spot price, using cache")
-			return cachedResponse.Price
-		}
-
-		var httpResponse PriceResponse
-		err6 := json.Unmarshal(body, &httpResponse)
-		if err6 != nil {
-			return cachedResponse.Price
-		}
-
-		self.WriteCacheBytes("price-response.json", body)
-
-		return httpResponse.Price
+	if !cacheOlderThanOneDay {
+		return cachedResponse.Price
 	}
 
-	return cachedResponse.Price
+	req, err3 := http.NewRequest("GET", self.ApiBaseUrl+"/api/XAG/USD", nil)
+	if err3 != nil {
+		fmt.Println("there was a problem retrieving the new spot price, using cache")
+		return cachedResponse.Price
+	}
+
+	req.Header.Add("x-access-token", self.ApiKey)
+
+	resp, err4 := self.HttpClient.Do(req)
+	if err4 != nil {
+		fmt.Println("there was a problem retrieving the new spot price, using cache")
+		return cachedResponse.Price
+	}
+
+	defer resp.Body.Close()
+
+	body, err5 := ioutil.ReadAll(resp.Body)
+	if err5 != nil {
+		fmt.Println("there was a problem retrieving the new spot price, using cache")
+		return cachedResponse.Price
+	}
+
+	var httpResponse PriceResponse
+	err6 := json.Unmarshal(body, &httpResponse)
+	if err6 != nil {
+		return cachedResponse.Price
+	}
+
+	self.WriteCacheBytes("price-response.json", body)
+
+	return httpResponse.Price
 }
 
 func GetPricingRepository() *PricingRepository {
