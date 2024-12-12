@@ -20,6 +20,7 @@ type HoldingFlags struct {
 	IsAdding     bool
 	IsListing    bool
 	IsDeleting   bool
+	IsValue      bool
 	OutputFormat OutputFormat
 }
 
@@ -27,9 +28,10 @@ func NewHoldingFlags(flags *pflag.FlagSet) (*HoldingFlags, error) {
 	isAdding, err := flags.GetBool("add")
 	isListing, err2 := flags.GetBool("list")
 	isDeleting, err3 := flags.GetBool("delete")
-	outputFormat, err4 := flags.GetString("format")
+	isValue, err4 := flags.GetBool("value")
+	outputFormat, err5 := flags.GetString("format")
 
-	if err != nil || err2 != nil || err3 != nil || err4 != nil {
+	if err != nil || err2 != nil || err3 != nil || err4 != nil || err5 != nil {
 		return nil, errors.New("could not parse flags")
 	}
 
@@ -37,6 +39,7 @@ func NewHoldingFlags(flags *pflag.FlagSet) (*HoldingFlags, error) {
 		IsAdding:     isAdding,
 		IsListing:    isListing,
 		IsDeleting:   isDeleting,
+		IsValue:      isValue,
 		OutputFormat: outputFormat,
 	}
 
@@ -81,11 +84,16 @@ func handleHolding(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	if flags.IsValue {
+		holdingService.GetValue()
+		return
+	}
+
 	holdingService.Add()
 }
 
 var holdingCmd = &cobra.Command{
-	Use:   "holding [--add | -a | --delete | -d | --list | -l] [--format output | -f output]",
+	Use:   "holding [--add | -a | --delete | -d | --list | -l | --value | -v] [--format output | -f output]",
 	Short: "Interacts with holdings in the system",
 	Long:  `This command allows you to interact with all holdings in the system. This allows you to add new holdings, view your holding, and do other operations on them as you use the flags this command provides.`,
 	Run:   handleHolding,
@@ -95,6 +103,7 @@ func init() {
 	holdingCmd.Flags().BoolP("add", "a", false, "tells the command you want to add a holding")
 	holdingCmd.Flags().BoolP("delete", "d", false, "tells the command you want to delete a holding")
 	holdingCmd.Flags().BoolP("list", "l", false, "tells the command you want to list your holdings")
+	holdingCmd.Flags().BoolP("value", "v", false, "tells the command you want to get your holdings value")
 	holdingCmd.Flags().StringP("format", "f", Table, fmt.Sprintf("decides the output format, supports: [\"%v\", \"%v\"]", Json, Table))
 
 	rootCmd.AddCommand(holdingCmd)

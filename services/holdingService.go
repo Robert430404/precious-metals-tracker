@@ -3,12 +3,14 @@ package services
 import (
 	"fmt"
 	"os"
+	"strconv"
 
 	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
 	"github.com/robert430404/precious-metals-tracker/config"
 	"github.com/robert430404/precious-metals-tracker/db"
 	"github.com/robert430404/precious-metals-tracker/db/entities"
+	"github.com/robert430404/precious-metals-tracker/http/pricing"
 	"github.com/robert430404/precious-metals-tracker/models"
 	"github.com/robert430404/precious-metals-tracker/transformers"
 	"github.com/robert430404/precious-metals-tracker/validations"
@@ -67,7 +69,7 @@ func (self *HoldingService) Delete() {
 }
 
 func (self *HoldingService) List() {
-		db := db.GetConnection()
+	db := db.GetConnection()
 
 	var holdings []entities.Holding
 
@@ -78,6 +80,53 @@ func (self *HoldingService) List() {
 	}
 
 	self.renderHoldingList(holdings)
+}
+
+func (self *HoldingService) GetValue() {
+	repository := pricing.GetPricingRepository()
+	db := db.GetConnection()
+
+	var holdings []entities.Holding
+
+	found := db.Find(&holdings)
+	if found.RowsAffected < 1 {
+		fmt.Print("no holdings are present, please add some. \n")
+		return
+	}
+
+	var totalWeight float64 = 0
+	for _, holding := range holdings {
+		unitWeight, err := strconv.ParseFloat(holding.UnitWeight, 16)
+		if err != nil {
+			continue
+		}
+
+		totalUnits, err2 := strconv.ParseFloat(holding.TotalUnits, 16)
+		if err2 != nil {
+			continue
+		}
+
+		totalWeight += unitWeight * totalUnits
+	}
+
+	spotPrice := repository.GetSilverSpot()
+	totalValue := totalWeight * spotPrice
+
+	self.renderValueTable(fmt.Sprintf("$%.2f", totalValue), fmt.Sprintf("$%.2f", spotPrice))
+}
+
+func (self *HoldingService) renderValueTable(value string, spotPrice string) {
+	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
+
+	table := table.New(
+		"Current Value",
+		"Current Spot Price",
+	)
+
+	table.WithHeaderFormatter(headerFmt)
+	table.AddRow(value, spotPrice)
+
+	table.Print()
 }
 
 func (self *HoldingService) renderHoldingList(holdings []entities.Holding) {
