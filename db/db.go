@@ -2,7 +2,7 @@ package db
 
 import (
 	"github.com/robert430404/precious-metals-tracker/config"
-	"gorm.io/driver/sqlite"
+	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 )
 
