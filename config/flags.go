@@ -11,8 +11,8 @@ import (
 type Flags struct {
 	configPath string
 
-	AddHoldingRan bool `json:"add_holding_ran"`
-	GoldAPIKey string `json:"gold_api_key"`
+	AddHoldingRan bool   `json:"add_holding_ran"`
+	GoldAPIKey    string `json:"gold_api_key"`
 }
 
 func (self *Flags) Hydrate(path string) {
@@ -67,7 +67,7 @@ func (self *Flags) writeFile() error {
 		return errors.New(fmt.Sprintf("there was a problem writing the flag file: %v", err))
 	}
 
-	err = os.WriteFile(self.configPath + "/flags.json", blob, 0644)
+	err = os.WriteFile(self.configPath+"/flags.json", blob, 0644)
 
 	return err
 }

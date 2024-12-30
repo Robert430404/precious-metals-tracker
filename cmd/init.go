@@ -41,7 +41,7 @@ var initCmd = &cobra.Command{
 		prompt := promptui.Prompt{
 			Label:    "goldapi.io API Key",
 			Validate: validations.ValidateString,
-			Default: loadedConfig.RuntimeFlags.GoldAPIKey,
+			Default:  loadedConfig.RuntimeFlags.GoldAPIKey,
 		}
 
 		result, err := prompt.Run()
