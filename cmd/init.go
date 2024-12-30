@@ -17,16 +17,23 @@ var initCmd = &cobra.Command{
 	Short: "Initializes the application in your environment",
 	Long:  `This command sets up and migrates the SQLite database for storing your holding information.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		loadedConfig := config.GetConfig()
+		loadedConfig, err := config.GetConfig()
+		if err != nil {
+			fmt.Printf("there was a problem loading your configuration: %v", err)
+		}
+
 		sqlitePath := loadedConfig.SqlitePath
 
-		_, err := os.Stat(sqlitePath)
+		_, err = os.Stat(sqlitePath)
 		if err != nil {
 			fmt.Print("creating sqlite file because it does not exist \n")
 			os.Create(sqlitePath)
 		}
 
-		db := db.GetConnection()
+		db, err := db.GetConnection()
+		if err != nil {
+			fmt.Printf("there was an error getting the database connection: %v", err)
+		}
 
 		fmt.Print("migrating the database \n")
 		db.AutoMigrate(&entities.Holding{})

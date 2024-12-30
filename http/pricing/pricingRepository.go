@@ -25,7 +25,12 @@ type PriceResponse struct {
 }
 
 func (self *PricingRepository) LoadCachedBytes(fileName string) ([]byte, error) {
-	configPath := config.GetConfig().ConfigPath
+	config, err := config.GetConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	configPath := config.ConfigPath
 	rawCachedBytes, err := os.Open(configPath + "/" + fileName)
 	if err != nil {
 		return nil, errors.New("could not load the cached response")
@@ -42,7 +47,13 @@ func (self *PricingRepository) LoadCachedBytes(fileName string) ([]byte, error) 
 }
 
 func (self *PricingRepository) WriteCacheBytes(fileName string, payload []byte) error {
-	configPath := config.GetConfig().ConfigPath
+	config, err := config.GetConfig()
+	if err != nil {
+		return err
+	}
+
+	configPath := config.ConfigPath
+
 	return os.WriteFile(configPath+"/"+fileName, payload, 0644)
 }
 
@@ -97,8 +108,13 @@ func (self *PricingRepository) GetSilverSpot() float64 {
 	return httpResponse.Price
 }
 
-func GetPricingRepository() *PricingRepository {
-	apiKey := config.GetConfig().RuntimeFlags.GoldAPIKey
+func GetPricingRepository() (*PricingRepository, error) {
+	config, err := config.GetConfig()
+	if err != nil {
+		return nil, err
+	}
+
+	apiKey := config.RuntimeFlags.GoldAPIKey
 
 	repository := &PricingRepository{
 		ApiKey:     apiKey,
@@ -106,5 +122,5 @@ func GetPricingRepository() *PricingRepository {
 		HttpClient: &http.Client{},
 	}
 
-	return repository
+	return repository, nil
 }

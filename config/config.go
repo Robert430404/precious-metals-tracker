@@ -1,6 +1,8 @@
 package config
 
 import (
+	"errors"
+	"fmt"
 	"os"
 )
 
@@ -12,10 +14,10 @@ type Config struct {
 
 var HydratedConfig *Config = nil
 
-func (self *Config) Hydrate() {
+func (self *Config) Hydrate() error {
 	var homeDir string = os.Getenv("HOME")
 	if len(homeDir) == 0 {
-		panic("could not load home home directory")
+		return errors.New("could not load home home directory")
 	}
 
 	self.ConfigPath = homeDir + "/.local/share/precious-metals-tracker"
@@ -26,15 +28,20 @@ func (self *Config) Hydrate() {
 	self.RuntimeFlags = flags
 
 	self.SqlitePath = self.ConfigPath + "/precious-metals-tracker.sqlite"
+
+	return nil
 }
 
-func GetConfig() *Config {
+func GetConfig() (*Config, error) {
 	if HydratedConfig != nil {
-		return HydratedConfig
+		return HydratedConfig, nil
 	}
 
 	HydratedConfig := &Config{}
-	HydratedConfig.Hydrate()
+	err := HydratedConfig.Hydrate()
+	if err != nil {
+		return nil, errors.New(fmt.Sprintf("there was a problem hydrating your configuration: %v", err))
+	}
 
-	return HydratedConfig
+	return HydratedConfig, nil
 }

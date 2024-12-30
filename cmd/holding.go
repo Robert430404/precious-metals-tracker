@@ -72,7 +72,11 @@ func handleHolding(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	holdingService := services.GetHoldingService()
+	holdingService, err := services.GetHoldingService()
+	if err != nil {
+		fmt.Printf("there was a problem resolving the holding service: %v", err)
+		return
+	}
 
 	if flags.IsDeleting {
 		holdingService.Delete()

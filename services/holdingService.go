@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -23,25 +24,39 @@ type HoldingService struct {
 
 var hydratedService *HoldingService = nil
 
-func GetHoldingService() *HoldingService {
+func GetHoldingService() (*HoldingService, error) {
 	if hydratedService != nil {
-		return hydratedService
+		return hydratedService, nil
+	}
+
+	config, err := config.GetConfig()
+	if err != nil {
+		return nil, err
 	}
 
 	hydratedService = &HoldingService{
-		LoadedConfig: config.GetConfig(),
+		LoadedConfig: config,
 	}
 
-	return hydratedService
+	return hydratedService, nil
 }
 
 func (self *HoldingService) Add() {
-	self.handleAddHoldingFirstRun()
+	err := self.handleAddHoldingFirstRun()
+	if err != nil {
+		fmt.Printf("There was a problem adding your holding: %v", err)
+		return
+	}
 
 	holding := &models.Holding{}
 	holding.Hydrate()
 
-	db := db.GetConnection()
+	db, err := db.GetConnection()
+	if err != nil {
+		fmt.Printf("there was a problem resolving the db connection: %v", err)
+		return
+	}
+
 	transformer := transformers.HoldingTransformer{}
 	transformed := transformer.TransformModelToEntity(holding)
 
@@ -61,7 +76,11 @@ func (self *HoldingService) Delete() {
 		return
 	}
 
-	db := db.GetConnection()
+	db, err := db.GetConnection()
+	if err != nil {
+		fmt.Printf("there was a problem resolving the db connection: %v", err)
+		return
+	}
 
 	db.Delete(&entities.Holding{}, result)
 
@@ -69,7 +88,11 @@ func (self *HoldingService) Delete() {
 }
 
 func (self *HoldingService) List() {
-	db := db.GetConnection()
+	db, err := db.GetConnection()
+	if err != nil {
+		fmt.Printf("there was a problem resolving the db connection: %v", err)
+		return
+	}
 
 	var holdings []entities.Holding
 
@@ -83,8 +106,17 @@ func (self *HoldingService) List() {
 }
 
 func (self *HoldingService) GetValue() {
-	repository := pricing.GetPricingRepository()
-	db := db.GetConnection()
+	repository, err := pricing.GetPricingRepository()
+	if err != nil {
+		fmt.Printf("there was a problem resolving the price repository: %v", err)
+		return
+	}
+
+	db, err := db.GetConnection()
+	if err != nil {
+		fmt.Printf("there was a problem resolving the db connection: %v", err)
+		return
+	}
 
 	var holdings []entities.Holding
 
@@ -158,17 +190,23 @@ func (self *HoldingService) renderHoldingList(holdings []entities.Holding) {
 	table.Print()
 }
 
-func (self *HoldingService) handleAddHoldingFirstRun() {
+func (self *HoldingService) handleAddHoldingFirstRun() error {
 	if self.LoadedConfig.RuntimeFlags.AddHoldingRan {
-		return
+		return nil
 	}
 
-	configPath := config.GetConfig().ConfigPath
-
-	err := os.MkdirAll(configPath, os.ModePerm)
+	config, err := config.GetConfig()
 	if err != nil {
-		panic(fmt.Sprintf("there was a problem ensuring the config path: %v\n", err))
+		return err
+	}
+
+	configPath := config.ConfigPath
+	err = os.MkdirAll(configPath, os.ModePerm)
+	if err != nil {
+		return errors.New(fmt.Sprintf("there was a problem ensuring the config path: %v\n", err))
 	}
 
 	self.LoadedConfig.RuntimeFlags.SetAddHoldingRan(true)
+
+	return nil
 }

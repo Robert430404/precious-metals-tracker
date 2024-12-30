@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -44,21 +45,31 @@ func (self *Flags) Hydrate(path string) {
 
 func (self *Flags) SetAddHoldingRan(flag bool) {
 	self.AddHoldingRan = flag
-	self.writeFile()
+	err := self.writeFile()
+	if err != nil {
+		fmt.Printf("there was a problem writing the flag json: %v", err)
+		return
+	}
 }
 
 func (self *Flags) SetGoldAPIKey(flag string) {
 	self.GoldAPIKey = flag
-	self.writeFile()
+	err := self.writeFile()
+	if err != nil {
+		fmt.Printf("there was a problem writing the flag json: %v", err)
+		return
+	}
 }
 
-func (self *Flags) writeFile() {
+func (self *Flags) writeFile() error {
 	blob, err := json.Marshal(self)
 	if err != nil {
-		panic(fmt.Sprintf("there was a problem writing the flag file: %v", err))
+		return errors.New(fmt.Sprintf("there was a problem writing the flag file: %v", err))
 	}
 
-	os.WriteFile(self.configPath + "/flags.json", blob, 0644)
+	err = os.WriteFile(self.configPath + "/flags.json", blob, 0644)
+
+	return err
 }
 
 func (self *Flags) loadDefaults() {
