@@ -7,6 +7,7 @@ require (
 	github.com/manifoldco/promptui v0.9.0
 	github.com/rodaine/table v1.3.0
 	github.com/spf13/cobra v1.8.1
+	github.com/spf13/pflag v1.0.5
 	gorm.io/driver/sqlite v1.5.6
 	gorm.io/gorm v1.25.12
 )
@@ -19,7 +20,6 @@ require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-sqlite3 v1.14.24 // indirect
-	github.com/spf13/pflag v1.0.5 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.19.0 // indirect
 )
