@@ -6,7 +6,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/fatih/color"
 	"github.com/manifoldco/promptui"
 	"github.com/robert430404/precious-metals-tracker/config"
 	"github.com/robert430404/precious-metals-tracker/db"
@@ -15,11 +14,11 @@ import (
 	"github.com/robert430404/precious-metals-tracker/models"
 	"github.com/robert430404/precious-metals-tracker/transformers"
 	"github.com/robert430404/precious-metals-tracker/validations"
-	"github.com/rodaine/table"
 )
 
 type HoldingService struct {
-	LoadedConfig *config.Config
+	LoadedConfig  *config.Config
+	TableRenderer *TableService
 }
 
 var hydratedService *HoldingService = nil
@@ -35,7 +34,8 @@ func GetHoldingService() (*HoldingService, error) {
 	}
 
 	hydratedService = &HoldingService{
-		LoadedConfig: config,
+		LoadedConfig:  config,
+		TableRenderer: &TableService{},
 	}
 
 	return hydratedService, nil
@@ -102,7 +102,7 @@ func (self *HoldingService) List() {
 		return
 	}
 
-	self.renderHoldingList(holdings)
+	self.TableRenderer.RenderHoldingList(holdings)
 }
 
 func (self *HoldingService) GetValue() {
@@ -144,50 +144,7 @@ func (self *HoldingService) GetValue() {
 	spotPrice := repository.GetSilverSpot()
 	totalValue := totalWeight * spotPrice
 
-	self.renderValueTable(fmt.Sprintf("$%.2f", totalValue), fmt.Sprintf("$%.2f", spotPrice))
-}
-
-func (self *HoldingService) renderValueTable(value string, spotPrice string) {
-	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
-
-	table := table.New(
-		"Current Value",
-		"Current Spot Price",
-	)
-
-	table.WithHeaderFormatter(headerFmt)
-	table.AddRow(value, spotPrice)
-
-	table.Print()
-}
-
-func (self *HoldingService) renderHoldingList(holdings []entities.Holding) {
-	headerFmt := color.New(color.FgGreen, color.Underline).SprintfFunc()
-	columnFmt := color.New(color.FgYellow).SprintfFunc()
-
-	table := table.New(
-		"ID",
-		"Name",
-		"Purchase Spot Price",
-		"Total Units",
-		"Unit Weight",
-		"Type",
-	)
-
-	table.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
-
-	for _, holding := range holdings {
-		table.AddRow(
-			holding.ID,
-			holding.Name,
-			holding.PurchaseSpotPrice,
-			holding.TotalUnits,
-			holding.UnitWeight,
-			holding.Type,
-		)
-	}
-
-	table.Print()
+	self.TableRenderer.RenderValueTable(fmt.Sprintf("$%.2f", totalValue), fmt.Sprintf("$%.2f", spotPrice))
 }
 
 func (self *HoldingService) handleAddHoldingFirstRun() error {
