@@ -8,18 +8,20 @@ import (
 )
 
 const RightBottomCorner = "\U00002518" // ┘
-const RightTopCorner = "\U00002510"    // ┐
 const RightBreak = "\U00002524"        // ┤
+const RightTopCorner = "\U00002510"    // ┐
 
-const LeftTopCorner = "\U0000250C"    // ┌
 const LeftBottomCorner = "\U00002514" // └
 const LeftBreak = "\U0000251C"        // ├
+const LeftTopCorner = "\U0000250C"    // ┌
 
-const Cross = "\U0000253C"          // ┼
+const Cross = "\U0000253C" // ┼
+
 const HorizontalLine = "\U00002500" // ─
-const BottomBreak = "\U00002534"    // ┴
-const TopBreak = "\U0000252C"       // ┬
 const VerticalLine = "\U00002502"   // │
+
+const BottomBreak = "\U00002534" // ┴
+const TopBreak = "\U0000252C"    // ┬
 
 type TableService struct{}
 
