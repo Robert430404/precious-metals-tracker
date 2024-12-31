@@ -94,7 +94,7 @@ func (self *TableService) RenderHoldingList(holdings []entities.Holding) {
 
 func (self *TableService) RenderValueTable(value string, spotPrice string) {
 	headers := []string{"Current Value", "Current Spot Price"}
-	data := [][]string{[]string{value, spotPrice}}
+	data := [][]string{{value, spotPrice}}
 
 	self.renderTable(headers, data)
 }
