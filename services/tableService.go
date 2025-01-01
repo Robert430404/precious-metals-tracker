@@ -3,6 +3,7 @@ package services
 import (
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/robert430404/precious-metals-tracker/db/entities"
 )
@@ -30,7 +31,7 @@ func (self *TableService) renderTable(headers []string, data [][]string) {
 
 	for _, entry := range data {
 		for index, composedString := range entry {
-			valueLen := len(composedString)
+			valueLen := utf8.RuneCountInString(composedString)
 
 			if len(colLengths) < len(entry) {
 				colLengths = append(colLengths, valueLen)
@@ -43,7 +44,7 @@ func (self *TableService) renderTable(headers []string, data [][]string) {
 	}
 
 	for index, header := range headers {
-		headerLen := len(header)
+		headerLen := utf8.RuneCountInString(header)
 		if headerLen > colLengths[index] {
 			colLengths[index] = headerLen
 		}
@@ -53,7 +54,10 @@ func (self *TableService) renderTable(headers []string, data [][]string) {
 
 	joinedHeaders := strings.Join(headers, " "+VerticalLine+" ")
 	headerLine := VerticalLine + " " + joinedHeaders + " " + VerticalLine
-	horizontalRule := strings.Repeat(HorizontalLine, len(headerLine)-16)
+
+	// We are subtracting 2 because rules are typically braced with a rune on the left and right
+	horizontalRule := strings.Repeat(HorizontalLine, utf8.RuneCountInString(headerLine) - 2)
+
 	topLine := LeftTopCorner + horizontalRule + RightTopCorner
 	bottomLine := LeftBreak + horizontalRule + RightBreak
 
