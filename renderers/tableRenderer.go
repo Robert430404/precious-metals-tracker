@@ -1,4 +1,4 @@
-package services
+package renderers
 
 import (
 	"fmt"
@@ -24,9 +24,9 @@ const VerticalLine = "\U00002502"   // │
 const BottomBreak = "\U00002534" // ┴
 const TopBreak = "\U0000252C"    // ┬
 
-type TableService struct{}
+type TableRenderer struct{}
 
-func (self *TableService) renderTable(headers []string, data [][]string) {
+func (self *TableRenderer) renderTable(headers []string, data [][]string) {
 	colLengths := []int{}
 
 	for _, entry := range data {
@@ -56,7 +56,7 @@ func (self *TableService) renderTable(headers []string, data [][]string) {
 	headerLine := VerticalLine + " " + joinedHeaders + " " + VerticalLine
 
 	// We are subtracting 2 because rules are typically braced with a rune on the left and right
-	horizontalRule := strings.Repeat(HorizontalLine, utf8.RuneCountInString(headerLine) - 2)
+	horizontalRule := strings.Repeat(HorizontalLine, utf8.RuneCountInString(headerLine)-2)
 
 	topLine := LeftTopCorner + horizontalRule + RightTopCorner
 	bottomLine := LeftBreak + horizontalRule + RightBreak
@@ -80,7 +80,7 @@ func (self *TableService) renderTable(headers []string, data [][]string) {
 	fmt.Print(LeftBottomCorner + horizontalRule + RightBottomCorner + "\n")
 }
 
-func (self *TableService) RenderHoldingList(holdings []entities.Holding) {
+func (self *TableRenderer) RenderHoldingList(holdings []entities.Holding) {
 	headers := []string{"ID", "Name", "Purchase Spot Price", "Total Units", "Unit Weight", "Type"}
 	data := [][]string{}
 
@@ -98,7 +98,7 @@ func (self *TableService) RenderHoldingList(holdings []entities.Holding) {
 	self.renderTable(headers, data)
 }
 
-func (self *TableService) RenderValueTable(value string, spotPrice string) {
+func (self *TableRenderer) RenderValueTable(value string, spotPrice string) {
 	headers := []string{"Current Value", "Current Spot Price"}
 	data := [][]string{{value, spotPrice}}
 

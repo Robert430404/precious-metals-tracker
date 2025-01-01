@@ -12,18 +12,19 @@ import (
 	"github.com/robert430404/precious-metals-tracker/db/entities"
 	"github.com/robert430404/precious-metals-tracker/http/pricing"
 	"github.com/robert430404/precious-metals-tracker/models"
+	"github.com/robert430404/precious-metals-tracker/renderers"
 	"github.com/robert430404/precious-metals-tracker/transformers"
 	"github.com/robert430404/precious-metals-tracker/validations"
 )
 
 type HoldingService struct {
 	LoadedConfig  *config.Config
-	TableRenderer *TableService
+	TableRenderer renderers.Renderer
 }
 
 var hydratedService *HoldingService = nil
 
-func GetHoldingService() (*HoldingService, error) {
+func GetHoldingService(outputType string) (*HoldingService, error) {
 	if hydratedService != nil {
 		return hydratedService, nil
 	}
@@ -33,9 +34,16 @@ func GetHoldingService() (*HoldingService, error) {
 		return nil, err
 	}
 
+	var renderer renderers.Renderer = nil
+	if outputType == "json" {
+		renderer = &renderers.JsonRenderer{}
+	} else {
+		renderer = &renderers.TableRenderer{}
+	}
+
 	hydratedService = &HoldingService{
 		LoadedConfig:  config,
-		TableRenderer: &TableService{},
+		TableRenderer: renderer,
 	}
 
 	return hydratedService, nil
