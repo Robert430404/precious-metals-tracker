@@ -58,16 +58,10 @@ func (self *PricingRepository) WriteCacheBytes(fileName string, payload []byte) 
 }
 
 func (self *PricingRepository) GetSilverSpot() float64 {
-	cachedResponseBytes, err := self.LoadCachedBytes("price-response.json")
-	if err != nil {
-		return 0
-	}
+	cachedResponseBytes, _ := self.LoadCachedBytes("price-response.json")
 
 	var cachedResponse PriceResponse
-	err2 := json.Unmarshal(cachedResponseBytes, &cachedResponse)
-	if err2 != nil {
-		return 0
-	}
+	json.Unmarshal(cachedResponseBytes, &cachedResponse)
 
 	oneDayAgo := time.Now().AddDate(0, 0, -1)
 	cacheOlderThanOneDay := cachedResponse.Timestamp < oneDayAgo.Unix()
