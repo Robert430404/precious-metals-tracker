@@ -24,7 +24,7 @@ type HoldingFlags struct {
 	OutputFormat OutputFormat
 }
 
-func NewHoldingFlags(flags *pflag.FlagSet) (*HoldingFlags, error) {
+func newHoldingFlags(flags *pflag.FlagSet) (*HoldingFlags, error) {
 	isAdding, err := flags.GetBool("add")
 	isListing, err2 := flags.GetBool("list")
 	isDeleting, err3 := flags.GetBool("delete")
@@ -46,7 +46,7 @@ func NewHoldingFlags(flags *pflag.FlagSet) (*HoldingFlags, error) {
 	return hydratedFlags, nil
 }
 
-func (self *HoldingFlags) IsValid() error {
+func (self *HoldingFlags) isValid() error {
 	trues := 0
 	for _, value := range []bool{self.IsAdding, self.IsListing, self.IsDeleting} {
 		if value {
@@ -66,8 +66,8 @@ func (self *HoldingFlags) IsValid() error {
 }
 
 func handleHolding(cmd *cobra.Command, args []string) {
-	flags, err := NewHoldingFlags(cmd.Flags())
-	if err != nil || flags.IsValid() != nil {
+	flags, err := newHoldingFlags(cmd.Flags())
+	if err != nil || flags.isValid() != nil {
 		fmt.Println("please provide a valid signiture, run `holding --help` for more information")
 		return
 	}
