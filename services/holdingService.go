@@ -152,7 +152,7 @@ func (self *HoldingService) GetValue() {
 	spotPrice := repository.GetSilverSpot()
 	totalValue := totalWeight * spotPrice
 
-	self.TableRenderer.RenderValueTable(fmt.Sprintf("$%.2f", totalValue), fmt.Sprintf("$%.2f", spotPrice))
+	self.TableRenderer.RenderValueTable(fmt.Sprintf("$%.2f", totalValue), fmt.Sprintf("$%.2f", spotPrice), fmt.Sprintf("%.2foz", totalWeight))
 }
 
 func (self *HoldingService) handleAddHoldingFirstRun() error {
