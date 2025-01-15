@@ -126,28 +126,27 @@ func (self *HoldingService) List() {
 }
 
 func (self *HoldingService) GetValue() {
-	spotPrice := self.silver.GetCurrentSilverSpot()
-
-	totalWeight, err := self.silver.GetTotalSilverWeight()
+	silverSpotPrice := self.silver.GetCurrentSilverSpot()
+	silverTotalWeight, err := self.silver.GetTotalSilverWeight()
 	if err != nil {
 		fmt.Printf("there was a problem getting total silver weight: %v \n", err)
 		return
 	}
 
-	totalValue, err := self.silver.GetTotalSilverValue()
+	silverTotalValue, err := self.silver.GetTotalSilverValue()
 	if err != nil {
 		fmt.Printf("there was a problem getting total silver value: %v \n", err)
 		return
 	}
-	goldspotPrice := self.gold.GetCurrentGoldSpot()
 
-	goldtotalWeight, err := self.gold.GetTotalGoldWeight()
+	goldSpotPrice := self.gold.GetCurrentGoldSpot()
+	goldTotalWeight, err := self.gold.GetTotalGoldWeight()
 	if err != nil {
 		fmt.Printf("there was a problem getting total gold weight: %v \n", err)
 		return
 	}
 
-	goldtotalValue, err := self.gold.GetTotalGoldValue()
+	goldTotalValue, err := self.gold.GetTotalGoldValue()
 	if err != nil {
 		fmt.Printf("there was a problem getting total gold value: %v \n", err)
 		return
@@ -156,15 +155,15 @@ func (self *HoldingService) GetValue() {
 	self.outputRenderer.RenderValueTable([][]string{
 		{
 			models.Silver,
-			fmt.Sprintf("$%.2f", totalValue),
-			fmt.Sprintf("$%.2f", spotPrice),
-			fmt.Sprintf("%.2foz", totalWeight),
+			fmt.Sprintf("$%.2f", silverTotalValue),
+			fmt.Sprintf("$%.2f", silverSpotPrice),
+			fmt.Sprintf("%.2foz", silverTotalWeight),
 		},
 		{
 			models.Gold,
-			fmt.Sprintf("$%.2f", goldtotalValue),
-			fmt.Sprintf("$%.2f", goldspotPrice),
-			fmt.Sprintf("%.2foz", goldtotalWeight),
+			fmt.Sprintf("$%.2f", goldTotalValue),
+			fmt.Sprintf("$%.2f", goldSpotPrice),
+			fmt.Sprintf("%.2foz", goldTotalWeight),
 		},
 	})
 }
