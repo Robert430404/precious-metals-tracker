@@ -22,6 +22,11 @@ func (self *Config) Hydrate() error {
 
 	self.ConfigPath = homeDir + "/.local/share/precious-metals-tracker"
 
+	var overrideConfigPath = os.Getenv("PRECIOUS_METALS_TRACKER_DIR")
+	if len(overrideConfigPath) > 0 {
+		self.ConfigPath = overrideConfigPath
+	}
+
 	flags := Flags{}
 	flags.Hydrate(self.ConfigPath)
 
