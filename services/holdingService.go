@@ -4,13 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"strconv"
 
 	"github.com/manifoldco/promptui"
 	"github.com/robert430404/precious-metals-tracker/config"
 	"github.com/robert430404/precious-metals-tracker/db"
 	"github.com/robert430404/precious-metals-tracker/db/entities"
-	"github.com/robert430404/precious-metals-tracker/http/pricing"
 	"github.com/robert430404/precious-metals-tracker/models"
 	"github.com/robert430404/precious-metals-tracker/renderers"
 	"github.com/robert430404/precious-metals-tracker/transformers"
@@ -20,6 +18,8 @@ import (
 type HoldingService struct {
 	LoadedConfig  *config.Config
 	TableRenderer renderers.Renderer
+	silver        SilverService
+	gold          GoldService
 }
 
 var hydratedService *HoldingService = nil
@@ -41,9 +41,16 @@ func GetHoldingService(outputType string) (*HoldingService, error) {
 		renderer = &renderers.TableRenderer{}
 	}
 
+	silverService, err := GetSilverService()
+	if err != nil {
+		return nil, err
+	}
+
 	hydratedService = &HoldingService{
 		LoadedConfig:  config,
 		TableRenderer: renderer,
+		silver:        *silverService,
+		gold:          GoldService{},
 	}
 
 	return hydratedService, nil
@@ -114,43 +121,19 @@ func (self *HoldingService) List() {
 }
 
 func (self *HoldingService) GetValue() {
-	repository, err := pricing.GetPricingRepository()
+	spotPrice := self.silver.GetCurrentSilverSpot()
+
+	totalWeight, err := self.silver.GetTotalSilverWeight()
 	if err != nil {
-		fmt.Printf("there was a problem resolving the price repository: %v", err)
+		fmt.Printf("there was a problem getting total silver weight: %v \n", err)
 		return
 	}
 
-	db, err := db.GetConnection()
+	totalValue, err := self.silver.GetTotalSilverValue()
 	if err != nil {
-		fmt.Printf("there was a problem resolving the db connection: %v", err)
+		fmt.Printf("there was a problem getting total silver value: %v \n", err)
 		return
 	}
-
-	var holdings []entities.Holding
-
-	found := db.Find(&holdings)
-	if found.RowsAffected < 1 {
-		fmt.Print("no holdings are present, please add some. \n")
-		return
-	}
-
-	var totalWeight float64 = 0
-	for _, holding := range holdings {
-		unitWeight, err := strconv.ParseFloat(holding.UnitWeight, 16)
-		if err != nil {
-			continue
-		}
-
-		totalUnits, err2 := strconv.ParseFloat(holding.TotalUnits, 16)
-		if err2 != nil {
-			continue
-		}
-
-		totalWeight += unitWeight * totalUnits
-	}
-
-	spotPrice := repository.GetSilverSpot()
-	totalValue := totalWeight * spotPrice
 
 	self.TableRenderer.RenderValueTable(fmt.Sprintf("$%.2f", totalValue), fmt.Sprintf("$%.2f", spotPrice), fmt.Sprintf("%.2foz", totalWeight))
 }

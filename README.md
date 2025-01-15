@@ -1,3 +1,3 @@
-# precious-metals-tracker
+# Precious Metals Tracker
 
-This is a simple application that works off of the CLI for managing your precious metal holdings. It does basic things like inventory tracking and price calculations.
+This is a simple application for tracking your precious metal holdings.
