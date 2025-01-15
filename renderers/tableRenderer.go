@@ -66,9 +66,8 @@ func (self *TableRenderer) RenderHoldingList(holdings []entities.Holding) {
 	self.renderTable(headers, data)
 }
 
-func (self *TableRenderer) RenderValueTable(value string, spotPrice string, totalWeight string) {
-	headers := []string{"Current Value", "Current Spot Price", "Total Holding Weight"}
-	data := [][]string{{value, spotPrice, totalWeight}}
+func (self *TableRenderer) RenderValueTable(data [][]string) {
+	headers := []string{"Metal Type", "Current Value", "Current Spot Price", "Total Holding Weight"}
 
 	self.renderTable(headers, data)
 }

@@ -16,10 +16,10 @@ import (
 )
 
 type HoldingService struct {
-	LoadedConfig  *config.Config
-	TableRenderer renderers.Renderer
-	silver        SilverService
-	gold          GoldService
+	loadedConfig   *config.Config
+	outputRenderer renderers.Renderer
+	silver         SilverService
+	gold           GoldService
 }
 
 var hydratedService *HoldingService = nil
@@ -46,11 +46,16 @@ func GetHoldingService(outputType string) (*HoldingService, error) {
 		return nil, err
 	}
 
+	goldService, err := GetGoldService()
+	if err != nil {
+		return nil, err
+	}
+
 	hydratedService = &HoldingService{
-		LoadedConfig:  config,
-		TableRenderer: renderer,
-		silver:        *silverService,
-		gold:          GoldService{},
+		loadedConfig:   config,
+		outputRenderer: renderer,
+		silver:         *silverService,
+		gold:           *goldService,
 	}
 
 	return hydratedService, nil
@@ -117,7 +122,7 @@ func (self *HoldingService) List() {
 		return
 	}
 
-	self.TableRenderer.RenderHoldingList(holdings)
+	self.outputRenderer.RenderHoldingList(holdings)
 }
 
 func (self *HoldingService) GetValue() {
@@ -134,12 +139,38 @@ func (self *HoldingService) GetValue() {
 		fmt.Printf("there was a problem getting total silver value: %v \n", err)
 		return
 	}
+	goldspotPrice := self.gold.GetCurrentGoldSpot()
 
-	self.TableRenderer.RenderValueTable(fmt.Sprintf("$%.2f", totalValue), fmt.Sprintf("$%.2f", spotPrice), fmt.Sprintf("%.2foz", totalWeight))
+	goldtotalWeight, err := self.gold.GetTotalGoldWeight()
+	if err != nil {
+		fmt.Printf("there was a problem getting total gold weight: %v \n", err)
+		return
+	}
+
+	goldtotalValue, err := self.gold.GetTotalGoldValue()
+	if err != nil {
+		fmt.Printf("there was a problem getting total gold value: %v \n", err)
+		return
+	}
+
+	self.outputRenderer.RenderValueTable([][]string{
+		{
+			models.Silver,
+			fmt.Sprintf("$%.2f", totalValue),
+			fmt.Sprintf("$%.2f", spotPrice),
+			fmt.Sprintf("%.2foz", totalWeight),
+		},
+		{
+			models.Gold,
+			fmt.Sprintf("$%.2f", goldtotalValue),
+			fmt.Sprintf("$%.2f", goldspotPrice),
+			fmt.Sprintf("%.2foz", goldtotalWeight),
+		},
+	})
 }
 
 func (self *HoldingService) handleAddHoldingFirstRun() error {
-	if self.LoadedConfig.RuntimeFlags.AddHoldingRan {
+	if self.loadedConfig.RuntimeFlags.AddHoldingRan {
 		return nil
 	}
 
@@ -154,7 +185,7 @@ func (self *HoldingService) handleAddHoldingFirstRun() error {
 		return errors.New(fmt.Sprintf("there was a problem ensuring the config path: %v\n", err))
 	}
 
-	self.LoadedConfig.RuntimeFlags.SetAddHoldingRan(true)
+	self.loadedConfig.RuntimeFlags.SetAddHoldingRan(true)
 
 	return nil
 }

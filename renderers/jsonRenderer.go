@@ -15,6 +15,39 @@ func (self *JsonRenderer) RenderHoldingList(holdings []entities.Holding) {
 	fmt.Print(string(blob))
 }
 
-func (self *JsonRenderer) RenderValueTable(value string, spotPrice string, totalWeight string) {
-	fmt.Printf("{\"value\": \"%v\", \"spotPrice\": \"%v\", \"totalWeight\": \"%v\"}", value, spotPrice, totalWeight)
+func (self *JsonRenderer) RenderValueTable(data [][]string) {
+	jsonString := "["
+
+	for index, value := range data {
+		if index > 0 {
+			jsonString += ","
+		}
+
+		row := "{"
+
+		for index2, value2 := range value {
+			key := "type"
+
+			if index2 == 1 {
+				key = "currentValue"
+			} else if index2 == 2 {
+				key = "currentSpotPrice"
+			} else if index2 == 3 {
+				key = "totalHoldingWeight"
+			}
+
+			if index2 > 0 {
+				row += ", "
+			}
+
+			row += fmt.Sprintf("\"%v\": \"%v\"", key, value2)
+		}
+
+		row += "}"
+
+		jsonString += row
+	}
+
+	jsonString += "]"
+	fmt.Print(jsonString)
 }

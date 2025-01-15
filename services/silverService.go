@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"strconv"
 
 	"github.com/robert430404/precious-metals-tracker/db"
 	"github.com/robert430404/precious-metals-tracker/db/entities"
@@ -12,8 +11,9 @@ import (
 )
 
 type SilverService struct {
-	connection *gorm.DB
-	repository *pricing.PricingRepository
+	connection  *gorm.DB
+	repository  *pricing.PricingRepository
+	calculation *CalculationService
 }
 
 var silverServiceInstance *SilverService = nil
@@ -23,16 +23,27 @@ func GetSilverService() (*SilverService, error) {
 		return silverServiceInstance, nil
 	}
 
-	con, err := db.GetConnection()
+	dbConnection, err := db.GetConnection()
 	if err != nil {
-		return nil, errors.New("could got get database connection when getting silver service")
+		return nil, errors.New("could not get database connection when getting silver service")
+	}
+
+	pricingRepo, err := pricing.GetPricingRepository()
+	if err != nil {
+		return nil, errors.New("could not get pricing repository")
 	}
 
 	silverServiceInstance = &SilverService{
-		connection: con,
+		connection:  dbConnection,
+		repository:  pricingRepo,
+		calculation: GetCalculationService(),
 	}
 
 	return silverServiceInstance, nil
+}
+
+func (self *SilverService) GetCurrentSilverSpot() float64 {
+	return self.repository.GetSilverSpot()
 }
 
 func (self *SilverService) GetTotalSilverWeight() (float64, error) {
@@ -43,26 +54,9 @@ func (self *SilverService) GetTotalSilverWeight() (float64, error) {
 		return 0, errors.New("no holdings are present, please add some.")
 	}
 
-	var totalWeight float64 = 0
-	for _, holding := range holdings {
-		unitWeight, err := strconv.ParseFloat(holding.UnitWeight, 16)
-		if err != nil {
-			continue
-		}
-
-		totalUnits, err2 := strconv.ParseFloat(holding.TotalUnits, 16)
-		if err2 != nil {
-			continue
-		}
-
-		totalWeight += unitWeight * totalUnits
-	}
+	totalWeight := self.calculation.CalculateMetalWeight(holdings)
 
 	return totalWeight, nil
-}
-
-func (self *SilverService) GetCurrentSilverSpot() float64 {
-	return self.repository.GetSilverSpot()
 }
 
 func (self *SilverService) GetTotalSilverValue() (float64, error) {
