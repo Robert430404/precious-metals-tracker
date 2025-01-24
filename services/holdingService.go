@@ -129,27 +129,23 @@ func (self *HoldingService) GetValue() {
 	silverSpotPrice := self.silver.GetCurrentSilverSpot()
 	silverTotalWeight, err := self.silver.GetTotalSilverWeight()
 	if err != nil {
-		fmt.Printf("there was a problem getting total silver weight: %v \n", err)
-		return
+		silverTotalWeight = 0
 	}
 
 	silverTotalValue, err := self.silver.GetTotalSilverValue()
 	if err != nil {
-		fmt.Printf("there was a problem getting total silver value: %v \n", err)
-		return
+		silverTotalValue = 0
 	}
 
 	goldSpotPrice := self.gold.GetCurrentGoldSpot()
 	goldTotalWeight, err := self.gold.GetTotalGoldWeight()
 	if err != nil {
-		fmt.Printf("there was a problem getting total gold weight: %v \n", err)
-		return
+		goldTotalWeight = 0
 	}
 
 	goldTotalValue, err := self.gold.GetTotalGoldValue()
 	if err != nil {
-		fmt.Printf("there was a problem getting total gold value: %v \n", err)
-		return
+		goldTotalValue = 0
 	}
 
 	self.outputRenderer.RenderValueTable([][]string{
