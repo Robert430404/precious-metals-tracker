@@ -3,3 +3,6 @@ test:
 
 format:
 	go fmt ./...
+
+build:
+	go build .

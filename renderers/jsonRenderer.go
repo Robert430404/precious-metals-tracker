@@ -15,7 +15,7 @@ func (self *JsonRenderer) RenderHoldingList(holdings []entities.Holding) {
 	fmt.Print(string(blob))
 }
 
-func (self *JsonRenderer) RenderValueTable(data [][]string) {
+func (self *JsonRenderer) RenderValueList(data [][]string) {
 	jsonString := "["
 
 	for index, value := range data {

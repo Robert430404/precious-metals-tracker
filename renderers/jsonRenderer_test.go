@@ -39,7 +39,7 @@ func TestJsonRendererRenderHoldingList(t *testing.T) {
 	}
 }
 
-func TestJsonRendererRenderValueTable(t *testing.T) {
+func TestJsonRendererRenderValueList(t *testing.T) {
 	renderer := &JsonRenderer{}
 
 	mockData := [][]string{
@@ -55,7 +55,7 @@ func TestJsonRendererRenderValueTable(t *testing.T) {
 	reader, writer, _ := os.Pipe()
 	os.Stdout = writer
 
-	renderer.RenderValueTable(mockData)
+	renderer.RenderValueList(mockData)
 
 	writer.Close()
 	out, _ := io.ReadAll(reader)

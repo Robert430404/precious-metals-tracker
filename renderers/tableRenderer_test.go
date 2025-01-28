@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestRenderValueTable(t *testing.T) {
+func TestRenderValueList(t *testing.T) {
 	renderer := &TableRenderer{}
 
 	mockData := [][]string{
@@ -23,7 +23,7 @@ func TestRenderValueTable(t *testing.T) {
 	reader, writer, _ := os.Pipe()
 	os.Stdout = writer
 
-	renderer.RenderValueTable(mockData)
+	renderer.RenderValueList(mockData)
 
 	writer.Close()
 	out, _ := io.ReadAll(reader)

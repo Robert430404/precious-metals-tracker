@@ -148,7 +148,7 @@ func (self *HoldingService) GetValue() {
 		goldTotalValue = 0
 	}
 
-	self.outputRenderer.RenderValueTable([][]string{
+	self.outputRenderer.RenderValueList([][]string{
 		{
 			models.Silver,
 			fmt.Sprintf("$%.2f", silverTotalValue),
