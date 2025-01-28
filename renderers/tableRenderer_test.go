@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestRenderTable(t *testing.T) {
+func TestRenderValueTable(t *testing.T) {
 	renderer := &TableRenderer{}
 
 	mockData := [][]string{
