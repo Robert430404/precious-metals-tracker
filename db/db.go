@@ -6,7 +6,7 @@ import (
 
 	"github.com/robert430404/precious-metals-tracker/config"
 
-	_ "github.com/glebarez/sqlite"
+	_ "modernc.org/sqlite"
 )
 
 var dbConnection *sql.DB = nil
