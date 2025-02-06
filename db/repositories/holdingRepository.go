@@ -35,96 +35,27 @@ func (self *HoldingRepository) GetAllHoldings() []*entities.Holding {
 	}
 	defer rows.Close()
 
-	var holdings []*entities.Holding
-
-	for rows.Next() {
-		var alb entities.Holding
-
-		if err := rows.Scan(
-			&alb.ID,
-			&alb.CreatedAt,
-			&alb.UpdatedAt,
-			&alb.DeletedAt,
-			&alb.Name,
-			&alb.Source,
-			&alb.PurchaseSpotPrice,
-			&alb.TotalUnits,
-			&alb.UnitWeight,
-			&alb.Type,
-		); err != nil {
-			break
-		}
-
-		holdings = append(holdings, &alb)
-	}
-
-	return holdings
+	return self.hydrateRows(rows)
 }
 
 func (self *HoldingRepository) GetAllSilverHoldings() []*entities.Holding {
-		rows, err := self.dbConnection.Query(`select * from holdings where type = "Silver"`)
+	rows, err := self.dbConnection.Query(`select * from holdings where type = "Silver"`)
 	if err != nil {
 		return nil
 	}
 	defer rows.Close()
 
-	var holdings []*entities.Holding
-
-	for rows.Next() {
-		var alb entities.Holding
-
-		if err := rows.Scan(
-			&alb.ID,
-			&alb.CreatedAt,
-			&alb.UpdatedAt,
-			&alb.DeletedAt,
-			&alb.Name,
-			&alb.Source,
-			&alb.PurchaseSpotPrice,
-			&alb.TotalUnits,
-			&alb.UnitWeight,
-			&alb.Type,
-		); err != nil {
-			break
-		}
-
-		holdings = append(holdings, &alb)
-	}
-
-	return holdings
+	return self.hydrateRows(rows)
 }
 
 func (self *HoldingRepository) GetAllGoldHoldings() []*entities.Holding {
-		rows, err := self.dbConnection.Query(`select * from holdings where type = "Gold"`)
+	rows, err := self.dbConnection.Query(`select * from holdings where type = "Gold"`)
 	if err != nil {
 		return nil
 	}
 	defer rows.Close()
 
-	var holdings []*entities.Holding
-
-	for rows.Next() {
-		var alb entities.Holding
-
-		if err := rows.Scan(
-			&alb.ID,
-			&alb.CreatedAt,
-			&alb.UpdatedAt,
-			&alb.DeletedAt,
-			&alb.Name,
-			&alb.Source,
-			&alb.PurchaseSpotPrice,
-			&alb.TotalUnits,
-			&alb.UnitWeight,
-			&alb.Type,
-		); err != nil {
-			break
-		}
-
-		holdings = append(holdings, &alb)
-	}
-
-	return holdings
+	return self.hydrateRows(rows)
 }
 
 func (self *HoldingRepository) DeleteHolding(id string) error {
@@ -159,15 +90,42 @@ func (self *HoldingRepository) CreateHolding(holding *entities.Holding) error {
 	}
 
 	_, err = statement.Exec(
-		time.Now().Format(time.RFC3339), 
-		time.Now().Format(time.RFC3339), 
-		holding.Name, 
-		holding.Source, 
-		holding.PurchaseSpotPrice, 
-		holding.TotalUnits, 
-		holding.UnitWeight, 
-		holding.Type, 
+		time.Now().Format(time.RFC3339),
+		time.Now().Format(time.RFC3339),
+		holding.Name,
+		holding.Source,
+		holding.PurchaseSpotPrice,
+		holding.TotalUnits,
+		holding.UnitWeight,
+		holding.Type,
 	)
 
 	return err
+}
+
+func (self *HoldingRepository) hydrateRows(rows *sql.Rows) []*entities.Holding {
+	var holdings []*entities.Holding
+
+	for rows.Next() {
+		var alb entities.Holding
+
+		if err := rows.Scan(
+			&alb.ID,
+			&alb.CreatedAt,
+			&alb.UpdatedAt,
+			&alb.DeletedAt,
+			&alb.Name,
+			&alb.Source,
+			&alb.PurchaseSpotPrice,
+			&alb.TotalUnits,
+			&alb.UnitWeight,
+			&alb.Type,
+		); err != nil {
+			break
+		}
+
+		holdings = append(holdings, &alb)
+	}
+
+	return holdings
 }
