@@ -6,8 +6,6 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/robert430404/precious-metals-tracker/config"
-	"github.com/robert430404/precious-metals-tracker/db"
-	"github.com/robert430404/precious-metals-tracker/db/entities"
 	"github.com/robert430404/precious-metals-tracker/validations"
 	"github.com/spf13/cobra"
 )
@@ -30,13 +28,7 @@ var initCmd = &cobra.Command{
 			os.Create(sqlitePath)
 		}
 
-		db, err := db.GetConnection()
-		if err != nil {
-			fmt.Printf("there was an error getting the database connection: %v", err)
-		}
-
 		fmt.Print("migrating the database \n")
-		db.AutoMigrate(&entities.Holding{})
 
 		prompt := promptui.Prompt{
 			Label:    "goldapi.io API Key",

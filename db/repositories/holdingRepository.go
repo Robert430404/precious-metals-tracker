@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/robert430404/precious-metals-tracker/db"
 	"github.com/robert430404/precious-metals-tracker/db/entities"
@@ -29,16 +28,36 @@ func GetHoldingRepository() *HoldingRepository {
 }
 
 func (self *HoldingRepository) GetAllHoldings() []*entities.Holding {
-	result, err := self.dbConnection.Query("select * from holdings");
+	rows, err := self.dbConnection.Query("select * from holdings")
 	if err != nil {
 		return nil
 	}
+	defer rows.Close()
 
-	fmt.Printf("rows: %v", result)
+	var holdings []*entities.Holding
 
-	return nil
+	for rows.Next() {
+		var alb entities.Holding
+		if err := rows.Scan(
+			&alb.ID,
+			&alb.CreatedAt,
+			&alb.UpdatedAt,
+			&alb.DeletedAt, 
+			&alb.Name, 
+			&alb.Source, 
+			&alb.PurchaseSpotPrice, 
+			&alb.TotalUnits, 
+			&alb.UnitWeight,
+			&alb.Type, 
+		); err != nil {
+			break
+		}
+		holdings = append(holdings, &alb)
+	}
+
+	return holdings
 }
 
-func (self *HoldingRepository) DeleteHolding() {}
+func (self *HoldingRepository) DeleteHolding(id string) {}
 
 func (self *HoldingRepository) CreateHolding(holding *entities.Holding) {}

@@ -7,8 +7,8 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/robert430404/precious-metals-tracker/config"
-	"github.com/robert430404/precious-metals-tracker/db"
 	"github.com/robert430404/precious-metals-tracker/db/entities"
+	"github.com/robert430404/precious-metals-tracker/db/repositories"
 	"github.com/robert430404/precious-metals-tracker/models"
 	"github.com/robert430404/precious-metals-tracker/renderers"
 	"github.com/robert430404/precious-metals-tracker/transformers"
@@ -20,6 +20,7 @@ type HoldingService struct {
 	outputRenderer renderers.Renderer
 	silver         SilverService
 	gold           GoldService
+	holdingRepo    *repositories.HoldingRepository
 }
 
 var hydratedService *HoldingService = nil
@@ -56,6 +57,7 @@ func GetHoldingService(outputType string) (*HoldingService, error) {
 		outputRenderer: renderer,
 		silver:         *silverService,
 		gold:           *goldService,
+		holdingRepo:    repositories.GetHoldingRepository(),
 	}
 
 	return hydratedService, nil
@@ -71,16 +73,10 @@ func (self *HoldingService) Add() {
 	holding := &models.Holding{}
 	holding.Hydrate()
 
-	db, err := db.GetConnection()
-	if err != nil {
-		fmt.Printf("there was a problem resolving the db connection: %v", err)
-		return
-	}
-
 	transformer := transformers.HoldingTransformer{}
 	transformed := transformer.TransformModelToEntity(holding)
 
-	db.Create(&transformed)
+	self.holdingRepo.CreateHolding(&transformed)
 	fmt.Print("stored holding \n")
 }
 
@@ -96,33 +92,25 @@ func (self *HoldingService) Delete() {
 		return
 	}
 
-	db, err := db.GetConnection()
-	if err != nil {
-		fmt.Printf("there was a problem resolving the db connection: %v", err)
-		return
-	}
-
-	db.Delete(&entities.Holding{}, result)
+	self.holdingRepo.DeleteHolding(result)
 
 	fmt.Printf("holding deleted: %v \n", result)
 }
 
 func (self *HoldingService) List() {
-	db, err := db.GetConnection()
-	if err != nil {
-		fmt.Printf("there was a problem resolving the db connection: %v", err)
-		return
-	}
-
-	var holdings []entities.Holding
-
-	found := db.Find(&holdings)
-	if found.RowsAffected < 1 {
+	found := self.holdingRepo.GetAllHoldings()
+	if found == nil {
 		fmt.Print("no holdings are present, please add some. \n")
 		return
 	}
 
-	self.outputRenderer.RenderHoldingList(holdings)
+	transformed := []entities.Holding{}
+
+	for _, holding := range found {
+		transformed = append(transformed, *holding)
+	}
+
+	self.outputRenderer.RenderHoldingList(transformed)
 }
 
 func (self *HoldingService) GetValue() {
