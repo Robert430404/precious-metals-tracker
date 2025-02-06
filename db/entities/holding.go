@@ -2,11 +2,10 @@ package entities
 
 import (
 	"github.com/robert430404/precious-metals-tracker/models"
-	"gorm.io/gorm"
 )
 
 type Holding struct {
-	gorm.Model
+	AttributesEntity
 
 	Name              string
 	Source            string
