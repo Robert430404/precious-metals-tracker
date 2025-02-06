@@ -42,13 +42,13 @@ func (self *HoldingRepository) GetAllHoldings() []*entities.Holding {
 			&alb.ID,
 			&alb.CreatedAt,
 			&alb.UpdatedAt,
-			&alb.DeletedAt, 
-			&alb.Name, 
-			&alb.Source, 
-			&alb.PurchaseSpotPrice, 
-			&alb.TotalUnits, 
+			&alb.DeletedAt,
+			&alb.Name,
+			&alb.Source,
+			&alb.PurchaseSpotPrice,
+			&alb.TotalUnits,
 			&alb.UnitWeight,
-			&alb.Type, 
+			&alb.Type,
 		); err != nil {
 			break
 		}

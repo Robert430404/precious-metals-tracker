@@ -1,3 +1,3 @@
 package migrations
 
-type MigrationsManager struct {}
+type MigrationsManager struct{}
