@@ -40,23 +40,24 @@ func (self *SilverService) GetCurrentSilverSpot() float64 {
 }
 
 func (self *SilverService) GetTotalSilverWeight() (float64, error) {
-	var holdings []entities.Holding
-
-	// found := self.connection.Find(&holdings, "type = ?", "Silver")
-	found := self.holdingRepo.GetAllHoldings()
-	if found != nil {
+	found := self.holdingRepo.GetAllSilverHoldings()
+	if found == nil {
 		return 0, errors.New("no holdings are present, please add some.")
 	}
 
-	totalWeight := self.calculation.CalculateMetalWeight(holdings)
+	transformed := []entities.Holding{}
+	for _, holding := range found {
+		transformed = append(transformed, *holding)
+	}
+
+	totalWeight := self.calculation.CalculateMetalWeight(transformed)
 
 	return totalWeight, nil
 }
 
 func (self *SilverService) GetTotalSilverValue() (float64, error) {
-	// found := self.connection.Find(&holdings, "type = ?", models.Silver)
-	found := self.holdingRepo.GetAllHoldings()
-	if found != nil {
+	found := self.holdingRepo.GetAllSilverHoldings()
+	if found == nil {
 		return 0, errors.New("no holdings are present, please add some.")
 	}
 

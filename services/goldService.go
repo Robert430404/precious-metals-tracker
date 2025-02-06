@@ -40,22 +40,23 @@ func (self *GoldService) GetCurrentGoldSpot() float64 {
 }
 
 func (self *GoldService) GetTotalGoldWeight() (float64, error) {
-	var holdings []entities.Holding
-
-	// found := self.connection.Find(&holdings, "type = ?", models.Gold)
-	found := self.holdingRepo.GetAllHoldings()
+	found := self.holdingRepo.GetAllGoldHoldings()
 	if found == nil {
 		return 0, errors.New("no holdings are present, please add some.")
 	}
 
-	totalWeight := self.calculation.CalculateMetalWeight(holdings)
+	transformed := []entities.Holding{}
+	for _, holding := range found {
+		transformed = append(transformed, *holding)
+	}
+
+	totalWeight := self.calculation.CalculateMetalWeight(transformed)
 
 	return totalWeight, nil
 }
 
 func (self *GoldService) GetTotalGoldValue() (float64, error) {
-	// found := self.connection.Find(&holdings, "type = ?", models.Gold)
-	found := self.holdingRepo.GetAllHoldings()
+	found := self.holdingRepo.GetAllGoldHoldings()
 	if found == nil {
 		return 0, errors.New("no holdings are present, please add some.")
 	}

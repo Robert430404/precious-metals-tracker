@@ -61,6 +61,72 @@ func (self *HoldingRepository) GetAllHoldings() []*entities.Holding {
 	return holdings
 }
 
+func (self *HoldingRepository) GetAllSilverHoldings() []*entities.Holding {
+		rows, err := self.dbConnection.Query(`select * from holdings where type = "Silver"`)
+	if err != nil {
+		return nil
+	}
+	defer rows.Close()
+
+	var holdings []*entities.Holding
+
+	for rows.Next() {
+		var alb entities.Holding
+
+		if err := rows.Scan(
+			&alb.ID,
+			&alb.CreatedAt,
+			&alb.UpdatedAt,
+			&alb.DeletedAt,
+			&alb.Name,
+			&alb.Source,
+			&alb.PurchaseSpotPrice,
+			&alb.TotalUnits,
+			&alb.UnitWeight,
+			&alb.Type,
+		); err != nil {
+			break
+		}
+
+		holdings = append(holdings, &alb)
+	}
+
+	return holdings
+}
+
+func (self *HoldingRepository) GetAllGoldHoldings() []*entities.Holding {
+		rows, err := self.dbConnection.Query(`select * from holdings where type = "Gold"`)
+	if err != nil {
+		return nil
+	}
+	defer rows.Close()
+
+	var holdings []*entities.Holding
+
+	for rows.Next() {
+		var alb entities.Holding
+
+		if err := rows.Scan(
+			&alb.ID,
+			&alb.CreatedAt,
+			&alb.UpdatedAt,
+			&alb.DeletedAt,
+			&alb.Name,
+			&alb.Source,
+			&alb.PurchaseSpotPrice,
+			&alb.TotalUnits,
+			&alb.UnitWeight,
+			&alb.Type,
+		); err != nil {
+			break
+		}
+
+		holdings = append(holdings, &alb)
+	}
+
+	return holdings
+}
+
 func (self *HoldingRepository) DeleteHolding(id string) error {
 	_, err := self.dbConnection.Exec("delete from holdings where id = ?", id)
 
