@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/robert430404/precious-metals-tracker/db"
 	"github.com/robert430404/precious-metals-tracker/db/entities"
@@ -38,6 +39,7 @@ func (self *HoldingRepository) GetAllHoldings() []*entities.Holding {
 
 	for rows.Next() {
 		var alb entities.Holding
+
 		if err := rows.Scan(
 			&alb.ID,
 			&alb.CreatedAt,
@@ -52,12 +54,54 @@ func (self *HoldingRepository) GetAllHoldings() []*entities.Holding {
 		); err != nil {
 			break
 		}
+
 		holdings = append(holdings, &alb)
 	}
 
 	return holdings
 }
 
-func (self *HoldingRepository) DeleteHolding(id string) {}
+func (self *HoldingRepository) DeleteHolding(id string) error {
+	_, err := self.dbConnection.Exec("delete from holdings where id = ?", id)
 
-func (self *HoldingRepository) CreateHolding(holding *entities.Holding) {}
+	return err
+}
+
+func (self *HoldingRepository) CreateHolding(holding *entities.Holding) error {
+	statement, err := self.dbConnection.Prepare(`insert into holdings (
+		created_at, 
+		updated_at, 
+		name, 
+		source, 
+		purchase_spot_price, 
+		total_units, 
+		unit_weight, 
+		type
+	) values (
+		?, 
+		?, 
+		?, 
+		?, 
+		?, 
+		?, 
+		?, 
+		?
+	)`)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = statement.Exec(
+		time.Now().Format(time.RFC3339), 
+		time.Now().Format(time.RFC3339), 
+		holding.Name, 
+		holding.Source, 
+		holding.PurchaseSpotPrice, 
+		holding.TotalUnits, 
+		holding.UnitWeight, 
+		holding.Type, 
+	)
+
+	return err
+}
