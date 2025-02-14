@@ -6,6 +6,7 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/robert430404/precious-metals-tracker/config"
+	"github.com/robert430404/precious-metals-tracker/db/migrations"
 	"github.com/robert430404/precious-metals-tracker/validations"
 	"github.com/spf13/cobra"
 )
@@ -28,7 +29,12 @@ var initCmd = &cobra.Command{
 			os.Create(sqlitePath)
 		}
 
-		fmt.Print("migrating the database \n")
+		fmt.Print("running migrations")
+		migrationManager := migrations.GetMigrationsManager()
+		err = migrationManager.Init()
+		if err != nil {
+			fmt.Printf("migrations manager failed to run migrations: %v", err)
+		}
 
 		prompt := promptui.Prompt{
 			Label:    "goldapi.io API Key",
