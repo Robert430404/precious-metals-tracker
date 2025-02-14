@@ -1,16 +1,17 @@
 package db
 
 import (
+	"database/sql"
 	"errors"
 
-	"github.com/glebarez/sqlite"
 	"github.com/robert430404/precious-metals-tracker/config"
-	"gorm.io/gorm"
+
+	_ "modernc.org/sqlite"
 )
 
-var dbConnection *gorm.DB = nil
+var dbConnection *sql.DB = nil
 
-func GetConnection() (*gorm.DB, error) {
+func GetConnection() (*sql.DB, error) {
 	if dbConnection != nil {
 		return dbConnection, nil
 	}
@@ -22,7 +23,7 @@ func GetConnection() (*gorm.DB, error) {
 
 	sqlitePath := loadedConfig.SqlitePath
 
-	db, err := gorm.Open(sqlite.Open(sqlitePath), &gorm.Config{})
+	db, err := sql.Open("sqlite", sqlitePath)
 	if err != nil {
 		return nil, errors.New("could not establish database connection, run init first")
 	}

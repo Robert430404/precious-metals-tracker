@@ -3,16 +3,14 @@ package services
 import (
 	"errors"
 
-	"github.com/robert430404/precious-metals-tracker/db"
 	"github.com/robert430404/precious-metals-tracker/db/entities"
+	"github.com/robert430404/precious-metals-tracker/db/repositories"
 	"github.com/robert430404/precious-metals-tracker/http/pricing"
-	"github.com/robert430404/precious-metals-tracker/models"
-	"gorm.io/gorm"
 )
 
 type GoldService struct {
-	connection  *gorm.DB
-	repository  *pricing.PricingRepository
+	holdingRepo *repositories.HoldingRepository
+	pricingRepo *pricing.PricingRepository
 	calculation *CalculationService
 }
 
@@ -23,19 +21,14 @@ func GetGoldService() (*GoldService, error) {
 		return goldServiceInstance, nil
 	}
 
-	dbConnection, err := db.GetConnection()
-	if err != nil {
-		return nil, errors.New("could not get database connection when getting silver service")
-	}
-
 	pricingRepo, err := pricing.GetPricingRepository()
 	if err != nil {
 		return nil, errors.New("could not get pricing repository")
 	}
 
 	goldServiceInstance = &GoldService{
-		connection:  dbConnection,
-		repository:  pricingRepo,
+		holdingRepo: repositories.GetHoldingRepository(),
+		pricingRepo: pricingRepo,
 		calculation: GetCalculationService(),
 	}
 
@@ -43,27 +36,28 @@ func GetGoldService() (*GoldService, error) {
 }
 
 func (self *GoldService) GetCurrentGoldSpot() float64 {
-	return self.repository.GetGoldSpot()
+	return self.pricingRepo.GetGoldSpot()
 }
 
 func (self *GoldService) GetTotalGoldWeight() (float64, error) {
-	var holdings []entities.Holding
-
-	found := self.connection.Find(&holdings, "type = ?", models.Gold)
-	if found.RowsAffected < 1 {
+	found := self.holdingRepo.GetAllGoldHoldings()
+	if found == nil {
 		return 0, errors.New("no holdings are present, please add some.")
 	}
 
-	totalWeight := self.calculation.CalculateMetalWeight(holdings)
+	transformed := []entities.Holding{}
+	for _, holding := range found {
+		transformed = append(transformed, *holding)
+	}
+
+	totalWeight := self.calculation.CalculateMetalWeight(transformed)
 
 	return totalWeight, nil
 }
 
 func (self *GoldService) GetTotalGoldValue() (float64, error) {
-	var holdings []entities.Holding
-
-	found := self.connection.Find(&holdings, "type = ?", models.Gold)
-	if found.RowsAffected < 1 {
+	found := self.holdingRepo.GetAllGoldHoldings()
+	if found == nil {
 		return 0, errors.New("no holdings are present, please add some.")
 	}
 
