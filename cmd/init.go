@@ -12,7 +12,7 @@ import (
 )
 
 var initCmd = &cobra.Command{
-	Use:   "init",
+	Use:   "init [--api-key key]",
 	Short: "Initializes the application in your environment",
 	Long:  `This command sets up and migrates the SQLite database for storing your holding information.`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -36,16 +36,36 @@ var initCmd = &cobra.Command{
 			fmt.Printf("migrations manager failed to run migrations: %v", err)
 		}
 
-		prompt := promptui.Prompt{
-			Label:    "goldapi.io API Key",
-			Validate: validations.ValidateString,
-			Default:  loadedConfig.RuntimeFlags.GoldAPIKey,
+		// Check if API key was provided via CLI flag
+		apiKey, err := cmd.Flags().GetString("api-key")
+		if err != nil {
+			fmt.Printf("there was a problem parsing the api-key flag: %v", err)
+			return
 		}
 
-		result, err := prompt.Run()
-		if err != nil {
-			fmt.Printf("%q failed: %v", "goldapi.io API Key", err)
-			return
+		var result string
+		if apiKey != "" {
+			// Validate the provided API key
+			if err := validations.ValidateString(apiKey); err != nil {
+				fmt.Printf("Invalid API key: %v\n", err)
+				return
+			}
+			result = apiKey
+			fmt.Print("Using CLI argument for API key\n")
+		} else {
+			// Fall back to wizard
+			fmt.Print("Using interactive prompt for API key\n")
+			prompt := promptui.Prompt{
+				Label:    "goldapi.io API Key",
+				Validate: validations.ValidateString,
+				Default:  loadedConfig.RuntimeFlags.GoldAPIKey,
+			}
+
+			result, err = prompt.Run()
+			if err != nil {
+				fmt.Printf("%q failed: %v", "goldapi.io API Key", err)
+				return
+			}
 		}
 
 		loadedConfig.RuntimeFlags.SetGoldAPIKey(result)
@@ -53,5 +73,6 @@ var initCmd = &cobra.Command{
 }
 
 func init() {
+	initCmd.Flags().StringP("api-key", "k", "", "goldapi.io API key to bypass interactive prompt")
 	rootCmd.AddCommand(initCmd)
 }

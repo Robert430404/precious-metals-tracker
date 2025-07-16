@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/robert430404/precious-metals-tracker/services"
+	"github.com/robert430404/precious-metals-tracker/types"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -16,39 +17,53 @@ const (
 	Json  OutputFormat = "json"
 )
 
-type HoldingFlags struct {
-	IsAdding     bool
-	IsListing    bool
-	IsDeleting   bool
-	IsValue      bool
-	OutputFormat OutputFormat
-}
-
-func newHoldingFlags(flags *pflag.FlagSet) (*HoldingFlags, error) {
+func newHoldingFlags(flags *pflag.FlagSet) (*types.HoldingFlags, error) {
 	isAdding, err := flags.GetBool("add")
 	isListing, err2 := flags.GetBool("list")
 	isDeleting, err3 := flags.GetBool("delete")
 	isValue, err4 := flags.GetBool("value")
 	outputFormat, err5 := flags.GetString("format")
 
-	if err != nil || err2 != nil || err3 != nil || err4 != nil || err5 != nil {
+	// Get new CLI args for adding holdings
+	name, err6 := flags.GetString("name")
+	price, err7 := flags.GetString("price")
+	source, err8 := flags.GetString("source")
+	spotPrice, err9 := flags.GetString("spot-price")
+	units, err10 := flags.GetString("units")
+	weight, err11 := flags.GetString("weight")
+	holdingType, err12 := flags.GetString("type")
+
+	// Get CLI args for deleting holdings
+	deleteID, err13 := flags.GetString("id")
+
+	if err != nil || err2 != nil || err3 != nil || err4 != nil || err5 != nil ||
+		err6 != nil || err7 != nil || err8 != nil || err9 != nil || err10 != nil ||
+		err11 != nil || err12 != nil || err13 != nil {
 		return nil, errors.New("could not parse flags")
 	}
 
-	hydratedFlags := &HoldingFlags{
+	hydratedFlags := &types.HoldingFlags{
 		IsAdding:     isAdding,
 		IsListing:    isListing,
 		IsDeleting:   isDeleting,
 		IsValue:      isValue,
 		OutputFormat: outputFormat,
+		Name:         name,
+		Price:        price,
+		Source:       source,
+		SpotPrice:    spotPrice,
+		Units:        units,
+		Weight:       weight,
+		Type:         holdingType,
+		DeleteID:     deleteID,
 	}
 
 	return hydratedFlags, nil
 }
 
-func (self *HoldingFlags) isValid() error {
+func isValidFlags(flags *types.HoldingFlags) error {
 	trues := 0
-	for _, value := range []bool{self.IsAdding, self.IsListing, self.IsDeleting} {
+	for _, value := range []bool{flags.IsAdding, flags.IsListing, flags.IsDeleting} {
 		if value {
 			trues += 1
 		}
@@ -58,8 +73,13 @@ func (self *HoldingFlags) isValid() error {
 		return errors.New("invalid flags passed")
 	}
 
-	if self.OutputFormat != Json && self.OutputFormat != Table {
+	if flags.OutputFormat != Json && flags.OutputFormat != Table {
 		return errors.New("invalid flags passed")
+	}
+
+	// Validate holding type if provided
+	if flags.Type != "" && flags.Type != "Silver" && flags.Type != "Gold" && flags.Type != "Platinum" {
+		return errors.New("invalid holding type, must be Silver, Gold, or Platinum")
 	}
 
 	return nil
@@ -67,7 +87,7 @@ func (self *HoldingFlags) isValid() error {
 
 func handleHolding(cmd *cobra.Command, args []string) {
 	flags, err := newHoldingFlags(cmd.Flags())
-	if err != nil || flags.isValid() != nil {
+	if err != nil || isValidFlags(flags) != nil {
 		fmt.Println("please provide a valid signiture, run `holding --help` for more information")
 		return
 	}
@@ -79,7 +99,7 @@ func handleHolding(cmd *cobra.Command, args []string) {
 	}
 
 	if flags.IsDeleting {
-		holdingService.Delete()
+		holdingService.Delete(flags.DeleteID)
 		return
 	}
 
@@ -93,7 +113,7 @@ func handleHolding(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	holdingService.Add()
+	holdingService.Add(flags)
 }
 
 var holdingCmd = &cobra.Command{
@@ -109,6 +129,18 @@ func init() {
 	holdingCmd.Flags().BoolP("list", "l", false, "tells the command you want to list your holdings")
 	holdingCmd.Flags().BoolP("value", "v", false, "tells the command you want to get your holdings value")
 	holdingCmd.Flags().StringP("format", "f", Table, fmt.Sprintf("decides the output format, supports: [\"%v\", \"%v\"]", Json, Table))
+
+	// CLI args for adding holdings (to bypass wizard)
+	holdingCmd.Flags().StringP("name", "n", "", "product name for the holding")
+	holdingCmd.Flags().StringP("price", "p", "", "purchase price of the holding")
+	holdingCmd.Flags().StringP("source", "s", "", "purchase source of the holding")
+	holdingCmd.Flags().String("spot-price", "", "spot price at time of purchase")
+	holdingCmd.Flags().StringP("units", "u", "", "total number of units")
+	holdingCmd.Flags().StringP("weight", "w", "", "weight of a single unit (in toz)")
+	holdingCmd.Flags().StringP("type", "t", "", "holding type (Silver, Gold, or Platinum)")
+
+	// CLI args for deleting holdings (to bypass wizard)
+	holdingCmd.Flags().String("id", "", "holding ID to delete")
 
 	rootCmd.AddCommand(holdingCmd)
 }

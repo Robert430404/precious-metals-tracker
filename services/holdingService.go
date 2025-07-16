@@ -12,6 +12,7 @@ import (
 	"github.com/robert430404/precious-metals-tracker/models"
 	"github.com/robert430404/precious-metals-tracker/renderers"
 	"github.com/robert430404/precious-metals-tracker/transformers"
+	"github.com/robert430404/precious-metals-tracker/types"
 	"github.com/robert430404/precious-metals-tracker/validations"
 )
 
@@ -70,7 +71,7 @@ func GetHoldingService(outputType string) (*HoldingService, error) {
 	return hydratedService, nil
 }
 
-func (self *HoldingService) Add() {
+func (self *HoldingService) Add(flags *types.HoldingFlags) {
 	err := self.handleAddHoldingFirstRun()
 	if err != nil {
 		fmt.Printf("There was a problem adding your holding: %v", err)
@@ -78,7 +79,54 @@ func (self *HoldingService) Add() {
 	}
 
 	holding := &models.Holding{}
-	holding.Hydrate()
+
+	// Check if all CLI arguments are provided to bypass wizard
+	if flags != nil && flags.HasAllAddFields() {
+		// Validate the provided values
+		if err := validations.ValidateString(flags.Name); err != nil {
+			fmt.Printf("Invalid product name: %v\n", err)
+			return
+		}
+		if err := validations.ValidatePrice(flags.Price); err != nil {
+			fmt.Printf("Invalid price: %v\n", err)
+			return
+		}
+		if err := validations.ValidateString(flags.Source); err != nil {
+			fmt.Printf("Invalid source: %v\n", err)
+			return
+		}
+		if err := validations.ValidatePrice(flags.SpotPrice); err != nil {
+			fmt.Printf("Invalid spot price: %v\n", err)
+			return
+		}
+		if err := validations.ValidateTotal(flags.Units); err != nil {
+			fmt.Printf("Invalid units: %v\n", err)
+			return
+		}
+		if err := validations.ValidatePrice(flags.Weight); err != nil {
+			fmt.Printf("Invalid weight: %v\n", err)
+			return
+		}
+
+		// Use CLI arguments to populate holding
+		holding.ProductName = flags.Name
+		holding.Price = flags.Price
+		holding.Source = flags.Source
+		holding.PurchaseSpotPrice = flags.SpotPrice
+		holding.TotalUnits = flags.Units
+		holding.UnitWeight = flags.Weight
+		holding.Type = flags.Type
+
+		fmt.Print("Using CLI arguments to create holding\n")
+	} else {
+		// Fall back to wizard
+		fmt.Print("Using interactive wizard to create holding\n")
+		err := holding.Hydrate()
+		if err != nil {
+			fmt.Printf("There was a problem with the wizard: %v", err)
+			return
+		}
+	}
 
 	transformer := transformers.HoldingTransformer{}
 	transformed := transformer.TransformModelToEntity(holding)
@@ -87,20 +135,34 @@ func (self *HoldingService) Add() {
 	fmt.Print("stored holding \n")
 }
 
-func (self *HoldingService) Delete() {
-	prompt := promptui.Prompt{
-		Label:    "Holding ID",
-		Validate: validations.ValidateTotal,
-	}
+func (self *HoldingService) Delete(holdingID string) {
+	// Use CLI argument if provided, otherwise prompt
+	var result string
+	if holdingID != "" {
+		// Validate the provided ID
+		if err := validations.ValidateTotal(holdingID); err != nil {
+			fmt.Printf("Invalid holding ID: %v\n", err)
+			return
+		}
+		result = holdingID
+		fmt.Print("Using CLI argument for holding ID\n")
+	} else {
+		// Fall back to wizard
+		fmt.Print("Using interactive prompt for holding ID\n")
+		prompt := promptui.Prompt{
+			Label:    "Holding ID",
+			Validate: validations.ValidateTotal,
+		}
 
-	result, err := prompt.Run()
-	if err != nil {
-		fmt.Printf("%q failed: %v", "Holding ID", err)
-		return
+		var err error
+		result, err = prompt.Run()
+		if err != nil {
+			fmt.Printf("%q failed: %v", "Holding ID", err)
+			return
+		}
 	}
 
 	self.holdingRepo.DeleteHolding(result)
-
 	fmt.Printf("holding deleted: %v \n", result)
 }
 
