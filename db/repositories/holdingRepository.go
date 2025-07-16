@@ -58,6 +58,16 @@ func (self *HoldingRepository) GetAllGoldHoldings() []*entities.Holding {
 	return self.hydrateRows(rows)
 }
 
+func (self *HoldingRepository) GetAllPlatinumHoldings() []*entities.Holding {
+	rows, err := self.dbConnection.Query(`select * from holdings where type = "Platinum"`)
+	if err != nil {
+		return nil
+	}
+	defer rows.Close()
+
+	return self.hydrateRows(rows)
+}
+
 func (self *HoldingRepository) DeleteHolding(id string) error {
 	_, err := self.dbConnection.Exec("delete from holdings where id = ?", id)
 
