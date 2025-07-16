@@ -20,6 +20,7 @@ type HoldingService struct {
 	outputRenderer renderers.Renderer
 	silver         SilverService
 	gold           GoldService
+	platinum       PlatinumService
 	holdingRepo    *repositories.HoldingRepository
 }
 
@@ -52,11 +53,17 @@ func GetHoldingService(outputType string) (*HoldingService, error) {
 		return nil, err
 	}
 
+	platinumService, err := GetPlatinumService()
+	if err != nil {
+		return nil, err
+	}
+
 	hydratedService = &HoldingService{
 		loadedConfig:   config,
 		outputRenderer: renderer,
 		silver:         *silverService,
 		gold:           *goldService,
+		platinum:       *platinumService,
 		holdingRepo:    repositories.GetHoldingRepository(),
 	}
 
@@ -136,6 +143,17 @@ func (self *HoldingService) GetValue() {
 		goldTotalValue = 0
 	}
 
+	platinumSpotPrice := self.platinum.GetCurrentPlatinumSpot()
+	platinumTotalWeight, err := self.platinum.GetTotalPlatinumWeight()
+	if err != nil {
+		platinumTotalWeight = 0
+	}
+
+	platinumTotalValue, err := self.platinum.GetTotalPlatinumValue()
+	if err != nil {
+		platinumTotalValue = 0
+	}
+
 	self.outputRenderer.RenderValueList([][]string{
 		{
 			models.Silver,
@@ -148,6 +166,12 @@ func (self *HoldingService) GetValue() {
 			fmt.Sprintf("$%.2f", goldTotalValue),
 			fmt.Sprintf("$%.2f", goldSpotPrice),
 			fmt.Sprintf("%.2foz", goldTotalWeight),
+		},
+		{
+			models.Platinum,
+			fmt.Sprintf("$%.2f", platinumTotalValue),
+			fmt.Sprintf("$%.2f", platinumSpotPrice),
+			fmt.Sprintf("%.2foz", platinumTotalWeight),
 		},
 	})
 }

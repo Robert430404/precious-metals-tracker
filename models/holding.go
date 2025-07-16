@@ -10,8 +10,9 @@ import (
 type HoldingType = string
 
 const (
-	Silver HoldingType = "Silver"
-	Gold   HoldingType = "Gold"
+	Silver   HoldingType = "Silver"
+	Gold     HoldingType = "Gold"
+	Platinum HoldingType = "Platinum"
 )
 
 type Holding struct {
@@ -102,7 +103,7 @@ func (*Holding) PromptForValue(label string, validation promptui.ValidateFunc) (
 func (*Holding) PromptForType() (string, error) {
 	typeSelect := promptui.Select{
 		Label: "Holding Type",
-		Items: []string{Silver, Gold},
+		Items: []string{Silver, Gold, Platinum},
 	}
 
 	_, result, err := typeSelect.Run()
