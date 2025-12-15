@@ -21,6 +21,14 @@ var initCmd = &cobra.Command{
 			fmt.Printf("there was a problem loading your configuration: %v", err)
 		}
 
+		err2 := os.MkdirAll(loadedConfig.ConfigPath, 0755)
+		if err2 != nil {
+			fmt.Print("there was a problem creating the configuration directory \n")
+			fmt.Printf("ensure that %q exists", loadedConfig.ConfigPath)
+
+			return
+		}
+
 		sqlitePath := loadedConfig.SqlitePath
 
 		_, err = os.Stat(sqlitePath)
@@ -34,6 +42,7 @@ var initCmd = &cobra.Command{
 		err = migrationManager.Init()
 		if err != nil {
 			fmt.Printf("migrations manager failed to run migrations: %v", err)
+			return
 		}
 
 		prompt := promptui.Prompt{
