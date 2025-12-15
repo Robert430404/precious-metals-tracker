@@ -21,8 +21,8 @@ var initCmd = &cobra.Command{
 			fmt.Printf("there was a problem loading your configuration: %v", err)
 		}
 
-		err2 := os.MkdirAll(loadedConfig.ConfigPath, 0755)
-		if err2 != nil {
+		err = os.MkdirAll(loadedConfig.ConfigPath, 0755)
+		if err != nil {
 			fmt.Print("there was a problem creating the configuration directory \n")
 			fmt.Printf("ensure that %q exists", loadedConfig.ConfigPath)
 
