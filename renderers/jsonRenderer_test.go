@@ -33,7 +33,7 @@ func TestJsonRendererRenderHoldingList(t *testing.T) {
 	out, _ := io.ReadAll(reader)
 	os.Stdout = rescueStdout
 
-	expectedOutput := "[{\"ID\":0,\"CreatedAt\":\"0001-01-01T00:00:00Z\",\"UpdatedAt\":\"0001-01-01T00:00:00Z\",\"DeletedAt\":null,\"Name\":\"name\",\"Source\":\"source\",\"PurchaseSpotPrice\":\"spot-price\",\"TotalUnits\":\"total-units\",\"UnitWeight\":\"unit-weight\",\"Type\":\"Gold\"}]"
+	expectedOutput := "[{\"ID\":0,\"CreatedAt\":\"0001-01-01T00:00:00Z\",\"UpdatedAt\":\"0001-01-01T00:00:00Z\",\"DeletedAt\":{\"Time\":\"0001-01-01T00:00:00Z\",\"Valid\":false},\"Name\":\"name\",\"Source\":\"source\",\"PurchaseSpotPrice\":\"spot-price\",\"TotalUnits\":\"total-units\",\"UnitWeight\":\"unit-weight\",\"Type\":\"Gold\"}]"
 	if string(out) != expectedOutput {
 		t.Fatalf("Output does not match: %s", out)
 	}
