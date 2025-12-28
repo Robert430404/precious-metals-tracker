@@ -1,7 +1,6 @@
 package services
 
 import (
-	"errors"
 	"fmt"
 	"os"
 
@@ -165,7 +164,7 @@ func (self *HoldingService) handleAddHoldingFirstRun() error {
 	configPath := config.ConfigPath
 	err = os.MkdirAll(configPath, os.ModePerm)
 	if err != nil {
-		return errors.New(fmt.Sprintf("there was a problem ensuring the config path: %v\n", err))
+		return fmt.Errorf("there was a problem ensuring the config path: %v\n", err)
 	}
 
 	self.loadedConfig.RuntimeFlags.SetAddHoldingRan(true)
