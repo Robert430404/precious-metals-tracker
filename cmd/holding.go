@@ -9,13 +9,6 @@ import (
 	"github.com/spf13/pflag"
 )
 
-type OutputFormat = string
-
-const (
-	Table OutputFormat = "table"
-	Json  OutputFormat = "json"
-)
-
 type HoldingFlags struct {
 	IsAdding     bool
 	IsListing    bool
@@ -46,7 +39,7 @@ func newHoldingFlags(flags *pflag.FlagSet) (*HoldingFlags, error) {
 	return hydratedFlags, nil
 }
 
-func (self *HoldingFlags) isValid() error {
+func (self *HoldingFlags) isHoldingFlagsValid() error {
 	trues := 0
 	for _, value := range []bool{self.IsAdding, self.IsListing, self.IsDeleting} {
 		if value {
@@ -67,7 +60,7 @@ func (self *HoldingFlags) isValid() error {
 
 func handleHolding(cmd *cobra.Command, args []string) {
 	flags, err := newHoldingFlags(cmd.Flags())
-	if err != nil || flags.isValid() != nil {
+	if err != nil || flags.isHoldingFlagsValid() != nil {
 		fmt.Println("please provide a valid signiture, run `holding --help` for more information")
 		return
 	}

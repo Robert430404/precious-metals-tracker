@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/robert430404/precious-metals-tracker/db/entities"
+	"github.com/robert430404/precious-metals-tracker/models"
 )
 
 type JsonRenderer struct{}
@@ -50,4 +51,14 @@ func (self *JsonRenderer) RenderValueList(data [][]string) {
 
 	jsonString += "]"
 	fmt.Print(jsonString)
+}
+
+func (self *JsonRenderer) RenderSpotPricing(silverSpot string, goldSpot string) {
+	fmt.Printf(
+		"{\"%v\": \"%v\", \"%v\": \"%v\"}",
+		models.Silver,
+		silverSpot,
+		models.Gold,
+		goldSpot,
+	)
 }

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -102,7 +101,7 @@ func (self *PricingRepository) GetSilverSpot() float64 {
 
 	defer resp.Body.Close()
 
-	body, err5 := ioutil.ReadAll(resp.Body)
+	body, err5 := io.ReadAll(resp.Body)
 	if err5 != nil {
 		fmt.Println("there was a problem retrieving the new spot price, using cache")
 		return cachedResponse.Price
@@ -147,7 +146,7 @@ func (self *PricingRepository) GetGoldSpot() float64 {
 
 	defer resp.Body.Close()
 
-	body, err5 := ioutil.ReadAll(resp.Body)
+	body, err5 := io.ReadAll(resp.Body)
 	if err5 != nil {
 		fmt.Println("there was a problem retrieving the new spot price, using cache")
 		return cachedResponse.Price

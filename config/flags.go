@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -64,7 +63,7 @@ func (self *Flags) SetGoldAPIKey(flag string) {
 func (self *Flags) writeFile() error {
 	blob, err := json.Marshal(self)
 	if err != nil {
-		return errors.New(fmt.Sprintf("there was a problem writing the flag file: %v", err))
+		return fmt.Errorf("there was a problem writing the flag file: %v", err)
 	}
 
 	err = os.WriteFile(self.configPath+"/flags.json", blob, 0644)

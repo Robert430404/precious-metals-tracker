@@ -7,6 +7,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/robert430404/precious-metals-tracker/db/entities"
+	"github.com/robert430404/precious-metals-tracker/models"
 )
 
 const RightBottomCorner = "\U00002518" // ┘
@@ -70,6 +71,21 @@ func (self *TableRenderer) RenderValueList(data [][]string) {
 	headers := []string{"Metal Type", "Current Value", "Current Spot Price", "Total Holding Weight"}
 
 	self.renderTable(headers, data)
+}
+
+func (self *TableRenderer) RenderSpotPricing(silverSpot string, goldSpot string) {
+	headers := []string{"Metal Type", "Spot Price"}
+
+	self.renderTable(headers, [][]string{
+		{
+			models.Silver,
+			silverSpot,
+		},
+		{
+			models.Gold,
+			goldSpot,
+		},
+	})
 }
 
 func (self *TableRenderer) renderTable(headers []string, data [][]string) {

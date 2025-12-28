@@ -45,7 +45,7 @@ func GetConfig() (*Config, error) {
 	HydratedConfig := &Config{}
 	err := HydratedConfig.Hydrate()
 	if err != nil {
-		return nil, errors.New(fmt.Sprintf("there was a problem hydrating your configuration: %v", err))
+		return nil, fmt.Errorf("there was a problem hydrating your configuration: %v", err)
 	}
 
 	return HydratedConfig, nil
